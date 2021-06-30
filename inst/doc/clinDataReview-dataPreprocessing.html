@@ -1,0 +1,1719 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+<meta name="author" content="Laure Cougnaud, Michela Pasetto" />
+
+<meta name="date" content="2021-06-29" />
+
+<title>Pre-processing of clinical data for clinical data review report</title>
+
+<script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
+// be compatible with the behavior of Pandoc < 2.8).
+document.addEventListener('DOMContentLoaded', function(e) {
+  var hs = document.querySelectorAll("div.section[class*='level'] > :first-child");
+  var i, h, a;
+  for (i = 0; i < hs.length; i++) {
+    h = hs[i];
+    if (!/^h[1-6]$/i.test(h.tagName)) continue;  // it should be a header h1-h6
+    a = h.attributes;
+    while (a.length > 0) h.removeAttribute(a[0].name);
+  }
+});
+</script>
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+
+<style type="text/css">
+  code {
+    white-space: pre;
+  }
+  .sourceCode {
+    overflow: visible;
+  }
+</style>
+<style type="text/css" data-origin="pandoc">
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    for (var j = 0; j < rules.length; j++) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") continue;
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') continue;
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
+
+
+
+
+<style type="text/css">body {
+background-color: #fff;
+margin: 1em auto;
+max-width: 700px;
+overflow: visible;
+padding-left: 2em;
+padding-right: 2em;
+font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+font-size: 14px;
+line-height: 1.35;
+}
+#TOC {
+clear: both;
+margin: 0 0 10px 10px;
+padding: 4px;
+width: 400px;
+border: 1px solid #CCCCCC;
+border-radius: 5px;
+background-color: #f6f6f6;
+font-size: 13px;
+line-height: 1.3;
+}
+#TOC .toctitle {
+font-weight: bold;
+font-size: 15px;
+margin-left: 5px;
+}
+#TOC ul {
+padding-left: 40px;
+margin-left: -1.5em;
+margin-top: 5px;
+margin-bottom: 5px;
+}
+#TOC ul ul {
+margin-left: -2em;
+}
+#TOC li {
+line-height: 16px;
+}
+table {
+margin: 1em auto;
+border-width: 1px;
+border-color: #DDDDDD;
+border-style: outset;
+border-collapse: collapse;
+}
+table th {
+border-width: 2px;
+padding: 5px;
+border-style: inset;
+}
+table td {
+border-width: 1px;
+border-style: inset;
+line-height: 18px;
+padding: 5px 5px;
+}
+table, table th, table td {
+border-left-style: none;
+border-right-style: none;
+}
+table thead, table tr.even {
+background-color: #f7f7f7;
+}
+p {
+margin: 0.5em 0;
+}
+blockquote {
+background-color: #f6f6f6;
+padding: 0.25em 0.75em;
+}
+hr {
+border-style: solid;
+border: none;
+border-top: 1px solid #777;
+margin: 28px 0;
+}
+dl {
+margin-left: 0;
+}
+dl dd {
+margin-bottom: 13px;
+margin-left: 13px;
+}
+dl dt {
+font-weight: bold;
+}
+ul {
+margin-top: 0;
+}
+ul li {
+list-style: circle outside;
+}
+ul ul {
+margin-bottom: 0;
+}
+pre, code {
+background-color: #f7f7f7;
+border-radius: 3px;
+color: #333;
+white-space: pre-wrap; 
+}
+pre {
+border-radius: 3px;
+margin: 5px 0px 10px 0px;
+padding: 10px;
+}
+pre:not([class]) {
+background-color: #f7f7f7;
+}
+code {
+font-family: Consolas, Monaco, 'Courier New', monospace;
+font-size: 85%;
+}
+p > code, li > code {
+padding: 2px 0px;
+}
+div.figure {
+text-align: center;
+}
+img {
+background-color: #FFFFFF;
+padding: 2px;
+border: 1px solid #DDDDDD;
+border-radius: 3px;
+border: 1px solid #CCCCCC;
+margin: 0 5px;
+}
+h1 {
+margin-top: 0;
+font-size: 35px;
+line-height: 40px;
+}
+h2 {
+border-bottom: 4px solid #f7f7f7;
+padding-top: 10px;
+padding-bottom: 2px;
+font-size: 145%;
+}
+h3 {
+border-bottom: 2px solid #f7f7f7;
+padding-top: 10px;
+font-size: 120%;
+}
+h4 {
+border-bottom: 1px solid #f7f7f7;
+margin-left: 8px;
+font-size: 105%;
+}
+h5, h6 {
+border-bottom: 1px solid #ccc;
+font-size: 105%;
+}
+a {
+color: #0033dd;
+text-decoration: none;
+}
+a:hover {
+color: #6666ff; }
+a:visited {
+color: #800080; }
+a:visited:hover {
+color: #BB00BB; }
+a[href^="http:"] {
+text-decoration: underline; }
+a[href^="https:"] {
+text-decoration: underline; }
+
+code > span.kw { color: #555; font-weight: bold; } 
+code > span.dt { color: #902000; } 
+code > span.dv { color: #40a070; } 
+code > span.bn { color: #d14; } 
+code > span.fl { color: #d14; } 
+code > span.ch { color: #d14; } 
+code > span.st { color: #d14; } 
+code > span.co { color: #888888; font-style: italic; } 
+code > span.ot { color: #007020; } 
+code > span.al { color: #ff0000; font-weight: bold; } 
+code > span.fu { color: #900; font-weight: bold; } 
+code > span.er { color: #a61717; background-color: #e3d2d2; } 
+</style>
+
+
+
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">Pre-processing of clinical data for clinical data review report</h1>
+<h4 class="author">Laure Cougnaud, Michela Pasetto</h4>
+<h4 class="date">June 29, 2021</h4>
+
+
+<div id="TOC">
+<ul>
+<li><a href="#data-format"><span class="toc-section-number">1</span> Data format</a></li>
+<li><a href="#annotate-data"><span class="toc-section-number">2</span> Annotate data</a></li>
+<li><a href="#filter-data"><span class="toc-section-number">3</span> Filter data</a></li>
+<li><a href="#transform-data"><span class="toc-section-number">4</span> Transform data</a></li>
+<li><a href="#process-data"><span class="toc-section-number">5</span> Process data</a></li>
+<li><a href="#appendix"><span class="toc-section-number">6</span> Appendix</a>
+<ul>
+<li><a href="#session-info"><span class="toc-section-number">6.1</span> Session info</a></li>
+</ul></li>
+</ul>
+</div>
+
+<p>This vignette shows functionalities used for annotating and filtering the data within the <code>clinDataReview</code> package.</p>
+<p>Utility functions to automate standard pre-processing steps of the data are available in the package.</p>
+<p>Note that these functions are mainly useful in combination with the specification of the parameters in ‘config’ file in the clinical data reports (see the dedicated reporting <a href="../doc/clinDataReview-reporting.html">vignette</a>).</p>
+<p>For this vignette, we will use example data available in the <code>clinUtils</code> package.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true"></a><span class="kw">library</span>(clinDataReview)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true"></a><span class="kw">library</span>(pander)</span></code></pre></div>
+<div id="data-format" class="section level1" number="1">
+<h1 number="1"><span class="header-section-number">1</span> Data format</h1>
+<p>The input dataset for the clinical data review should be a <code>data.frame</code> with clinical data. Such data is typically imported from <em>SAS</em> data file or <em>xpt</em> data file.<br />
+Such dataset can be imported for multiple files at once via the <code>clinUtils::loadDataADaMSDTM</code> function.</p>
+<p>The label of the variables stored in the <code>SAS</code> datasets is also used for title/captions.</p>
+<p>A few <code>ADaM</code> datasets are included in the <code>clinUtils</code> package for the demonstration, via the dataset <code>dataADaMCDISCP01</code> and corresponding variable labels.</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true"></a><span class="kw">library</span>(clinUtils)</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true"></a></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true"></a><span class="kw">data</span>(dataADaMCDISCP01)</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true"></a>labelVars &lt;-<span class="st"> </span><span class="kw">attr</span>(dataADaMCDISCP01, <span class="st">&quot;labelVars&quot;</span>)</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true"></a></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true"></a>dataLB &lt;-<span class="st"> </span>dataADaMCDISCP01<span class="op">$</span>ADLBC</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true"></a>dataDM &lt;-<span class="st"> </span>dataADaMCDISCP01<span class="op">$</span>ADSL</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true"></a>dataAE &lt;-<span class="st"> </span>dataADaMCDISCP01<span class="op">$</span>ADAE</span></code></pre></div>
+</div>
+<div id="annotate-data" class="section level1" number="2">
+<h1 number="2"><span class="header-section-number">2</span> Annotate data</h1>
+<p>The <code>annotateData</code> enables to add metadata for a specific domain/dataset.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true"></a>dataLBAnnot &lt;-<span class="st"> </span><span class="kw">annotateData</span>(</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true"></a>    <span class="dt">data =</span> dataLB, </span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true"></a>    <span class="dt">annotations =</span> <span class="kw">list</span>(<span class="dt">data =</span> dataDM, <span class="dt">vars =</span> <span class="kw">c</span>(<span class="st">&quot;ETHNIC&quot;</span>, <span class="st">&quot;ARM&quot;</span>)), </span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true"></a>    <span class="dt">verbose =</span> <span class="ot">TRUE</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true"></a>)</span></code></pre></div>
+<pre><code>## Data annotated with variable(s): ETHNIC (&#39;ETHNIC&#39;), ARM (&#39;ARM&#39;) from the &#39;custom&#39; dataset based on the variable(s):  USUBJID (&#39;USUBJID&#39;).</code></pre>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true"></a><span class="kw">pander</span>(</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true"></a>    <span class="kw">head</span>(dataLBAnnot), </span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true"></a>    <span class="dt">caption =</span> <span class="kw">paste</span>(<span class="st">&quot;Laboratory parameters annotated with&quot;</span>,</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true"></a>        <span class="st">&quot;demographics information with the `annotatedData` function&quot;</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true"></a>    )</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true"></a>)</span></code></pre></div>
+<table style="width:96%;">
+<caption>Laboratory parameters annotated with demographics information with the <code>annotatedData</code> function (continued below)</caption>
+<colgroup>
+<col width="20%" />
+<col width="12%" />
+<col width="19%" />
+<col width="31%" />
+<col width="11%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="center">STUDYID</th>
+<th align="center">SUBJID</th>
+<th align="center">USUBJID</th>
+<th align="center">TRTP</th>
+<th align="center">TRTPN</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center">CDISCPILOT01</td>
+<td align="center">1148</td>
+<td align="center">01-701-1148</td>
+<td align="center">Xanomeline High Dose</td>
+<td align="center">81</td>
+</tr>
+<tr class="even">
+<td align="center">CDISCPILOT01</td>
+<td align="center">1148</td>
+<td align="center">01-701-1148</td>
+<td align="center">Xanomeline High Dose</td>
+<td align="center">81</td>
+</tr>
+<tr class="odd">
+<td align="center">CDISCPILOT01</td>
+<td align="center">1148</td>
+<td align="center">01-701-1148</td>
+<td align="center">Xanomeline High Dose</td>
+<td align="center">81</td>
+</tr>
+<tr class="even">
+<td align="center">CDISCPILOT01</td>
+<td align="center">1148</td>
+<td align="center">01-701-1148</td>
+<td align="center">Xanomeline High Dose</td>
+<td align="center">81</td>
+</tr>
+<tr class="odd">
+<td align="center">CDISCPILOT01</td>
+<td align="center">1148</td>
+<td align="center">01-701-1148</td>
+<td align="center">Xanomeline High Dose</td>
+<td align="center">81</td>
+</tr>
+<tr class="even">
+<td align="center">CDISCPILOT01</td>
+<td align="center">1148</td>
+<td align="center">01-701-1148</td>
+<td align="center">Xanomeline High Dose</td>
+<td align="center">81</td>
+</tr>
+</tbody>
+</table>
+<table>
+<caption>Table continues below</caption>
+<colgroup>
+<col width="31%" />
+<col width="11%" />
+<col width="18%" />
+<col width="18%" />
+<col width="8%" />
+<col width="12%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="center">TRTA</th>
+<th align="center">TRTAN</th>
+<th align="center">TRTSDT</th>
+<th align="center">TRTEDT</th>
+<th align="center">AGE</th>
+<th align="center">AGEGR1</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center">Xanomeline High Dose</td>
+<td align="center">81</td>
+<td align="center">2013-08-23</td>
+<td align="center">2014-02-20</td>
+<td align="center">57</td>
+<td align="center">&lt;65</td>
+</tr>
+<tr class="even">
+<td align="center">Xanomeline High Dose</td>
+<td align="center">81</td>
+<td align="center">2013-08-23</td>
+<td align="center">2014-02-20</td>
+<td align="center">57</td>
+<td align="center">&lt;65</td>
+</tr>
+<tr class="odd">
+<td align="center">Xanomeline High Dose</td>
+<td align="center">81</td>
+<td align="center">2013-08-23</td>
+<td align="center">2014-02-20</td>
+<td align="center">57</td>
+<td align="center">&lt;65</td>
+</tr>
+<tr class="even">
+<td align="center">Xanomeline High Dose</td>
+<td align="center">81</td>
+<td align="center">2013-08-23</td>
+<td align="center">2014-02-20</td>
+<td align="center">57</td>
+<td align="center">&lt;65</td>
+</tr>
+<tr class="odd">
+<td align="center">Xanomeline High Dose</td>
+<td align="center">81</td>
+<td align="center">2013-08-23</td>
+<td align="center">2014-02-20</td>
+<td align="center">57</td>
+<td align="center">&lt;65</td>
+</tr>
+<tr class="even">
+<td align="center">Xanomeline High Dose</td>
+<td align="center">81</td>
+<td align="center">2013-08-23</td>
+<td align="center">2014-02-20</td>
+<td align="center">57</td>
+<td align="center">&lt;65</td>
+</tr>
+</tbody>
+</table>
+<table>
+<caption>Table continues below</caption>
+<colgroup>
+<col width="13%" />
+<col width="11%" />
+<col width="11%" />
+<col width="8%" />
+<col width="15%" />
+<col width="13%" />
+<col width="11%" />
+<col width="15%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="center">AGEGR1N</th>
+<th align="center">RACE</th>
+<th align="center">RACEN</th>
+<th align="center">SEX</th>
+<th align="center">COMP24FL</th>
+<th align="center">DSRAEFL</th>
+<th align="center">SAFFL</th>
+<th align="center">AVISIT</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center">1</td>
+<td align="center">WHITE</td>
+<td align="center">1</td>
+<td align="center">M</td>
+<td align="center">Y</td>
+<td align="center"></td>
+<td align="center">Y</td>
+<td align="center">Baseline</td>
+</tr>
+<tr class="even">
+<td align="center">1</td>
+<td align="center">WHITE</td>
+<td align="center">1</td>
+<td align="center">M</td>
+<td align="center">Y</td>
+<td align="center"></td>
+<td align="center">Y</td>
+<td align="center">Baseline</td>
+</tr>
+<tr class="odd">
+<td align="center">1</td>
+<td align="center">WHITE</td>
+<td align="center">1</td>
+<td align="center">M</td>
+<td align="center">Y</td>
+<td align="center"></td>
+<td align="center">Y</td>
+<td align="center">Baseline</td>
+</tr>
+<tr class="even">
+<td align="center">1</td>
+<td align="center">WHITE</td>
+<td align="center">1</td>
+<td align="center">M</td>
+<td align="center">Y</td>
+<td align="center"></td>
+<td align="center">Y</td>
+<td align="center">Baseline</td>
+</tr>
+<tr class="odd">
+<td align="center">1</td>
+<td align="center">WHITE</td>
+<td align="center">1</td>
+<td align="center">M</td>
+<td align="center">Y</td>
+<td align="center"></td>
+<td align="center">Y</td>
+<td align="center">Baseline</td>
+</tr>
+<tr class="even">
+<td align="center">1</td>
+<td align="center">WHITE</td>
+<td align="center">1</td>
+<td align="center">M</td>
+<td align="center">Y</td>
+<td align="center"></td>
+<td align="center">Y</td>
+<td align="center">Baseline</td>
+</tr>
+</tbody>
+</table>
+<table style="width:75%;">
+<caption>Table continues below</caption>
+<colgroup>
+<col width="13%" />
+<col width="8%" />
+<col width="18%" />
+<col width="19%" />
+<col width="15%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="center">AVISITN</th>
+<th align="center">ADY</th>
+<th align="center">ADT</th>
+<th align="center">VISIT</th>
+<th align="center">VISITNUM</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center">0</td>
+<td align="center">-9</td>
+<td align="center">2013-08-14</td>
+<td align="center">SCREENING 1</td>
+<td align="center">1</td>
+</tr>
+<tr class="even">
+<td align="center">0</td>
+<td align="center">-9</td>
+<td align="center">2013-08-14</td>
+<td align="center">SCREENING 1</td>
+<td align="center">1</td>
+</tr>
+<tr class="odd">
+<td align="center">0</td>
+<td align="center">-9</td>
+<td align="center">2013-08-14</td>
+<td align="center">SCREENING 1</td>
+<td align="center">1</td>
+</tr>
+<tr class="even">
+<td align="center">0</td>
+<td align="center">-9</td>
+<td align="center">2013-08-14</td>
+<td align="center">SCREENING 1</td>
+<td align="center">1</td>
+</tr>
+<tr class="odd">
+<td align="center">0</td>
+<td align="center">-9</td>
+<td align="center">2013-08-14</td>
+<td align="center">SCREENING 1</td>
+<td align="center">1</td>
+</tr>
+<tr class="even">
+<td align="center">0</td>
+<td align="center">-9</td>
+<td align="center">2013-08-14</td>
+<td align="center">SCREENING 1</td>
+<td align="center">1</td>
+</tr>
+</tbody>
+</table>
+<table>
+<caption>Table continues below</caption>
+<colgroup>
+<col width="36%" />
+<col width="12%" />
+<col width="11%" />
+<col width="12%" />
+<col width="8%" />
+<col width="8%" />
+<col width="8%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="center">PARAM</th>
+<th align="center">PARAMCD</th>
+<th align="center">PARAMN</th>
+<th align="center">PARCAT1</th>
+<th align="center">AVAL</th>
+<th align="center">BASE</th>
+<th align="center">CHG</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center">Sodium (mmol/L)</td>
+<td align="center">SODIUM</td>
+<td align="center">18</td>
+<td align="center">CHEM</td>
+<td align="center">139</td>
+<td align="center">139</td>
+<td align="center">NA</td>
+</tr>
+<tr class="even">
+<td align="center">Potassium (mmol/L)</td>
+<td align="center">K</td>
+<td align="center">19</td>
+<td align="center">CHEM</td>
+<td align="center">4</td>
+<td align="center">4</td>
+<td align="center">NA</td>
+</tr>
+<tr class="odd">
+<td align="center">Chloride (mmol/L)</td>
+<td align="center">CL</td>
+<td align="center">20</td>
+<td align="center">CHEM</td>
+<td align="center">109</td>
+<td align="center">109</td>
+<td align="center">NA</td>
+</tr>
+<tr class="even">
+<td align="center">Bilirubin (umol/L)</td>
+<td align="center">BILI</td>
+<td align="center">21</td>
+<td align="center">CHEM</td>
+<td align="center">8.55</td>
+<td align="center">8.55</td>
+<td align="center">NA</td>
+</tr>
+<tr class="odd">
+<td align="center">Alkaline Phosphatase (U/L)</td>
+<td align="center">ALP</td>
+<td align="center">22</td>
+<td align="center">CHEM</td>
+<td align="center">88</td>
+<td align="center">88</td>
+<td align="center">NA</td>
+</tr>
+<tr class="even">
+<td align="center">Gamma Glutamyl Transferase (U/L)</td>
+<td align="center">GGT</td>
+<td align="center">23</td>
+<td align="center">CHEM</td>
+<td align="center">43</td>
+<td align="center">43</td>
+<td align="center">NA</td>
+</tr>
+</tbody>
+</table>
+<table>
+<caption>Table continues below</caption>
+<colgroup>
+<col width="9%" />
+<col width="9%" />
+<col width="12%" />
+<col width="12%" />
+<col width="13%" />
+<col width="13%" />
+<col width="13%" />
+<col width="15%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="center">A1LO</th>
+<th align="center">A1HI</th>
+<th align="center">R2A1LO</th>
+<th align="center">R2A1HI</th>
+<th align="center">BR2A1LO</th>
+<th align="center">BR2A1HI</th>
+<th align="center">ANL01FL</th>
+<th align="center">ALBTRVAL</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center">132</td>
+<td align="center">147</td>
+<td align="center">1.053</td>
+<td align="center">0.9456</td>
+<td align="center">1.053</td>
+<td align="center">0.9456</td>
+<td align="center"></td>
+<td align="center">81.5</td>
+</tr>
+<tr class="even">
+<td align="center">3.4</td>
+<td align="center">5.4</td>
+<td align="center">1.176</td>
+<td align="center">0.7407</td>
+<td align="center">1.176</td>
+<td align="center">0.7407</td>
+<td align="center"></td>
+<td align="center">4.1</td>
+</tr>
+<tr class="odd">
+<td align="center">94</td>
+<td align="center">112</td>
+<td align="center">1.16</td>
+<td align="center">0.9732</td>
+<td align="center">1.16</td>
+<td align="center">0.9732</td>
+<td align="center"></td>
+<td align="center">62</td>
+</tr>
+<tr class="even">
+<td align="center">3</td>
+<td align="center">21</td>
+<td align="center">2.85</td>
+<td align="center">0.4071</td>
+<td align="center">2.85</td>
+<td align="center">0.4071</td>
+<td align="center"></td>
+<td align="center">22.95</td>
+</tr>
+<tr class="odd">
+<td align="center">31</td>
+<td align="center">110</td>
+<td align="center">2.839</td>
+<td align="center">0.8</td>
+<td align="center">2.839</td>
+<td align="center">0.8</td>
+<td align="center"></td>
+<td align="center">77</td>
+</tr>
+<tr class="even">
+<td align="center">10</td>
+<td align="center">61</td>
+<td align="center">4.3</td>
+<td align="center">0.7049</td>
+<td align="center">4.3</td>
+<td align="center">0.7049</td>
+<td align="center"></td>
+<td align="center">48.5</td>
+</tr>
+</tbody>
+</table>
+<table style="width:100%;">
+<caption>Table continues below</caption>
+<colgroup>
+<col width="11%" />
+<col width="11%" />
+<col width="10%" />
+<col width="14%" />
+<col width="10%" />
+<col width="12%" />
+<col width="14%" />
+<col width="14%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="center">ANRIND</th>
+<th align="center">BNRIND</th>
+<th align="center">ABLFL</th>
+<th align="center">AENTMTFL</th>
+<th align="center">LBSEQ</th>
+<th align="center">LBNRIND</th>
+<th align="center">LBSTRESN</th>
+<th align="center">DATASET</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center">N</td>
+<td align="center">N</td>
+<td align="center">Y</td>
+<td align="center"></td>
+<td align="center">26</td>
+<td align="center">NORMAL</td>
+<td align="center">139</td>
+<td align="center">ADLBC</td>
+</tr>
+<tr class="even">
+<td align="center">N</td>
+<td align="center">N</td>
+<td align="center">Y</td>
+<td align="center"></td>
+<td align="center">19</td>
+<td align="center">NORMAL</td>
+<td align="center">4</td>
+<td align="center">ADLBC</td>
+</tr>
+<tr class="odd">
+<td align="center">N</td>
+<td align="center">N</td>
+<td align="center">Y</td>
+<td align="center"></td>
+<td align="center">11</td>
+<td align="center">NORMAL</td>
+<td align="center">109</td>
+<td align="center">ADLBC</td>
+</tr>
+<tr class="even">
+<td align="center">N</td>
+<td align="center">N</td>
+<td align="center">Y</td>
+<td align="center"></td>
+<td align="center">6</td>
+<td align="center">NORMAL</td>
+<td align="center">8.55</td>
+<td align="center">ADLBC</td>
+</tr>
+<tr class="odd">
+<td align="center">N</td>
+<td align="center">N</td>
+<td align="center">Y</td>
+<td align="center"></td>
+<td align="center">2</td>
+<td align="center">NORMAL</td>
+<td align="center">88</td>
+<td align="center">ADLBC</td>
+</tr>
+<tr class="even">
+<td align="center">N</td>
+<td align="center">N</td>
+<td align="center">Y</td>
+<td align="center"></td>
+<td align="center">15</td>
+<td align="center">NORMAL</td>
+<td align="center">43</td>
+<td align="center">ADLBC</td>
+</tr>
+</tbody>
+</table>
+<table style="width:69%;">
+<colgroup>
+<col width="34%" />
+<col width="34%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="center">ETHNIC</th>
+<th align="center">ARM</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center">NOT HISPANIC OR LATINO</td>
+<td align="center">Xanomeline High Dose</td>
+</tr>
+<tr class="even">
+<td align="center">NOT HISPANIC OR LATINO</td>
+<td align="center">Xanomeline High Dose</td>
+</tr>
+<tr class="odd">
+<td align="center">NOT HISPANIC OR LATINO</td>
+<td align="center">Xanomeline High Dose</td>
+</tr>
+<tr class="even">
+<td align="center">NOT HISPANIC OR LATINO</td>
+<td align="center">Xanomeline High Dose</td>
+</tr>
+<tr class="odd">
+<td align="center">NOT HISPANIC OR LATINO</td>
+<td align="center">Xanomeline High Dose</td>
+</tr>
+<tr class="even">
+<td align="center">NOT HISPANIC OR LATINO</td>
+<td align="center">Xanomeline High Dose</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="filter-data" class="section level1" number="3">
+<h1 number="3"><span class="header-section-number">3</span> Filter data</h1>
+<p>The <code>filterData</code> enables to filter a dataset.</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true"></a>dataLBAnnotTreatment &lt;-<span class="st"> </span><span class="kw">filterData</span>(</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true"></a>    <span class="dt">data =</span> dataLBAnnot, </span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true"></a>    <span class="dt">filters =</span> <span class="kw">list</span>(<span class="dt">var =</span> <span class="st">&quot;ARM&quot;</span>, <span class="dt">value =</span> <span class="st">&quot;Placebo&quot;</span>, <span class="dt">rev =</span> <span class="ot">TRUE</span>), </span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true"></a>    <span class="dt">verbose =</span> <span class="ot">TRUE</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true"></a>)</span></code></pre></div>
+<pre><code>## 354 records with ARM (&#39;ARM&#39;) %in% &#39;Placebo&#39; are filtered in data.</code></pre>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true"></a><span class="kw">pander</span>(</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true"></a>    <span class="kw">unique</span>(dataLBAnnotTreatment[, <span class="kw">c</span>(<span class="st">&quot;USUBJID&quot;</span>, <span class="st">&quot;ARM&quot;</span>)]), </span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true"></a>    <span class="dt">caption =</span> <span class="kw">paste</span>(<span class="st">&quot;Subset of laboratory parameters filtered&quot;</span>,</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true"></a>        <span class="st">&quot;with placebo patients&quot;</span></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true"></a>    )</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true"></a>)</span></code></pre></div>
+<table style="width:67%;">
+<caption>Subset of laboratory parameters filtered with placebo patients</caption>
+<colgroup>
+<col width="15%" />
+<col width="19%" />
+<col width="31%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="center"> </th>
+<th align="center">USUBJID</th>
+<th align="center">ARM</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center"><strong>1</strong></td>
+<td align="center">01-701-1148</td>
+<td align="center">Xanomeline High Dose</td>
+</tr>
+<tr class="even">
+<td align="center"><strong>397</strong></td>
+<td align="center">01-701-1192</td>
+<td align="center">Xanomeline Low Dose</td>
+</tr>
+<tr class="odd">
+<td align="center"><strong>793</strong></td>
+<td align="center">01-701-1211</td>
+<td align="center">Xanomeline Low Dose</td>
+</tr>
+<tr class="even">
+<td align="center"><strong>1363</strong></td>
+<td align="center">01-718-1371</td>
+<td align="center">Xanomeline High Dose</td>
+</tr>
+<tr class="odd">
+<td align="center"><strong>1615</strong></td>
+<td align="center">01-718-1427</td>
+<td align="center">Xanomeline High Dose</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="transform-data" class="section level1" number="4">
+<h1 number="4"><span class="header-section-number">4</span> Transform data</h1>
+<p>The <code>transformData</code> enables to convert data to a different format.</p>
+<p>For example, the laboratory data is converted from a long format, containing one record per endpoint * visit * subject to a wide format containing one record per visit * subject. The endpoints are included in different columns.</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true"></a>eDishData &lt;-<span class="st"> </span><span class="kw">transformData</span>(</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true"></a>    <span class="dt">data =</span> <span class="kw">subset</span>(dataLB, PARAMCD <span class="op">%in%</span><span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;ALT&quot;</span>, <span class="st">&quot;BILI&quot;</span>)),</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true"></a>    <span class="dt">transformations =</span> <span class="kw">list</span>(</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true"></a>        <span class="dt">type =</span> <span class="st">&quot;pivot_wider&quot;</span>,</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true"></a>        <span class="dt">varsID =</span> <span class="kw">c</span>(<span class="st">&quot;USUBJID&quot;</span>, <span class="st">&quot;VISIT&quot;</span>), </span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true"></a>        <span class="dt">varsValue =</span> <span class="kw">c</span>(<span class="st">&quot;LBSTRESN&quot;</span>, <span class="st">&quot;LBNRIND&quot;</span>),</span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true"></a>        <span class="dt">varPivot =</span> <span class="st">&quot;PARAMCD&quot;</span></span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true"></a>    ),</span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true"></a>    <span class="dt">verbose =</span> <span class="ot">TRUE</span>,</span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true"></a>    <span class="dt">labelVars =</span> labelVars</span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true"></a>)</span></code></pre></div>
+<pre><code>## Warning in reshapeWide(data, idvar = idvar, timevar = timevar, varying = varying, : some constant variables
+## (AVISIT,AVISITN,PARAM,PARAMN,AVAL,BASE,CHG,A1LO,A1HI,R2A1LO,R2A1HI,BR2A1LO,BR2A1HI,ANL01FL,ALBTRVAL,LBSEQ) are really varying</code></pre>
+<pre><code>## Warning in reshapeWide(data, idvar = idvar, timevar = timevar, varying = varying, : multiple rows match for PARAMCD=BILI: first taken</code></pre>
+<pre><code>## Warning in reshapeWide(data, idvar = idvar, timevar = timevar, varying = varying, : multiple rows match for PARAMCD=ALT: first taken</code></pre>
+<pre><code>## Data is converted to a wide format with variables: &#39;Numeric Result/Finding in Standard Units&#39;, &#39;Reference Range Indicator&#39; for different: &#39;Parameter Code&#39; by &#39;Unique Subject Identifier&#39;, &#39;Visit Name&#39; pivoted to different columns.</code></pre>
+<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true"></a><span class="kw">pander</span>(<span class="kw">head</span>(eDishData))</span></code></pre></div>
+<table>
+<caption>Table continues below</caption>
+<colgroup>
+<col width="12%" />
+<col width="18%" />
+<col width="11%" />
+<col width="17%" />
+<col width="29%" />
+<col width="10%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="center"> </th>
+<th align="center">STUDYID</th>
+<th align="center">SUBJID</th>
+<th align="center">USUBJID</th>
+<th align="center">TRTP</th>
+<th align="center">TRTPN</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center"><strong>4</strong></td>
+<td align="center">CDISCPILOT01</td>
+<td align="center">1148</td>
+<td align="center">01-701-1148</td>
+<td align="center">Xanomeline High Dose</td>
+<td align="center">81</td>
+</tr>
+<tr class="even">
+<td align="center"><strong>40</strong></td>
+<td align="center">CDISCPILOT01</td>
+<td align="center">1148</td>
+<td align="center">01-701-1148</td>
+<td align="center">Xanomeline High Dose</td>
+<td align="center">81</td>
+</tr>
+<tr class="odd">
+<td align="center"><strong>76</strong></td>
+<td align="center">CDISCPILOT01</td>
+<td align="center">1148</td>
+<td align="center">01-701-1148</td>
+<td align="center">Xanomeline High Dose</td>
+<td align="center">81</td>
+</tr>
+<tr class="even">
+<td align="center"><strong>112</strong></td>
+<td align="center">CDISCPILOT01</td>
+<td align="center">1148</td>
+<td align="center">01-701-1148</td>
+<td align="center">Xanomeline High Dose</td>
+<td align="center">81</td>
+</tr>
+<tr class="odd">
+<td align="center"><strong>148</strong></td>
+<td align="center">CDISCPILOT01</td>
+<td align="center">1148</td>
+<td align="center">01-701-1148</td>
+<td align="center">Xanomeline High Dose</td>
+<td align="center">81</td>
+</tr>
+<tr class="even">
+<td align="center"><strong>184</strong></td>
+<td align="center">CDISCPILOT01</td>
+<td align="center">1148</td>
+<td align="center">01-701-1148</td>
+<td align="center">Xanomeline High Dose</td>
+<td align="center">81</td>
+</tr>
+</tbody>
+</table>
+<table>
+<caption>Table continues below</caption>
+<colgroup>
+<col width="13%" />
+<col width="31%" />
+<col width="10%" />
+<col width="17%" />
+<col width="17%" />
+<col width="8%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="center"> </th>
+<th align="center">TRTA</th>
+<th align="center">TRTAN</th>
+<th align="center">TRTSDT</th>
+<th align="center">TRTEDT</th>
+<th align="center">AGE</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center"><strong>4</strong></td>
+<td align="center">Xanomeline High Dose</td>
+<td align="center">81</td>
+<td align="center">2013-08-23</td>
+<td align="center">2014-02-20</td>
+<td align="center">57</td>
+</tr>
+<tr class="even">
+<td align="center"><strong>40</strong></td>
+<td align="center">Xanomeline High Dose</td>
+<td align="center">81</td>
+<td align="center">2013-08-23</td>
+<td align="center">2014-02-20</td>
+<td align="center">57</td>
+</tr>
+<tr class="odd">
+<td align="center"><strong>76</strong></td>
+<td align="center">Xanomeline High Dose</td>
+<td align="center">81</td>
+<td align="center">2013-08-23</td>
+<td align="center">2014-02-20</td>
+<td align="center">57</td>
+</tr>
+<tr class="even">
+<td align="center"><strong>112</strong></td>
+<td align="center">Xanomeline High Dose</td>
+<td align="center">81</td>
+<td align="center">2013-08-23</td>
+<td align="center">2014-02-20</td>
+<td align="center">57</td>
+</tr>
+<tr class="odd">
+<td align="center"><strong>148</strong></td>
+<td align="center">Xanomeline High Dose</td>
+<td align="center">81</td>
+<td align="center">2013-08-23</td>
+<td align="center">2014-02-20</td>
+<td align="center">57</td>
+</tr>
+<tr class="even">
+<td align="center"><strong>184</strong></td>
+<td align="center">Xanomeline High Dose</td>
+<td align="center">81</td>
+<td align="center">2013-08-23</td>
+<td align="center">2014-02-20</td>
+<td align="center">57</td>
+</tr>
+</tbody>
+</table>
+<table style="width:100%;">
+<caption>Table continues below</caption>
+<colgroup>
+<col width="12%" />
+<col width="10%" />
+<col width="12%" />
+<col width="9%" />
+<col width="9%" />
+<col width="7%" />
+<col width="13%" />
+<col width="12%" />
+<col width="12%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="center"> </th>
+<th align="center">AGEGR1</th>
+<th align="center">AGEGR1N</th>
+<th align="center">RACE</th>
+<th align="center">RACEN</th>
+<th align="center">SEX</th>
+<th align="center">COMP24FL</th>
+<th align="center">DSRAEFL</th>
+<th align="center">SAFFL</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center"><strong>4</strong></td>
+<td align="center">&lt;65</td>
+<td align="center">1</td>
+<td align="center">WHITE</td>
+<td align="center">1</td>
+<td align="center">M</td>
+<td align="center">Y</td>
+<td align="center"></td>
+<td align="center">Y</td>
+</tr>
+<tr class="even">
+<td align="center"><strong>40</strong></td>
+<td align="center">&lt;65</td>
+<td align="center">1</td>
+<td align="center">WHITE</td>
+<td align="center">1</td>
+<td align="center">M</td>
+<td align="center">Y</td>
+<td align="center"></td>
+<td align="center">Y</td>
+</tr>
+<tr class="odd">
+<td align="center"><strong>76</strong></td>
+<td align="center">&lt;65</td>
+<td align="center">1</td>
+<td align="center">WHITE</td>
+<td align="center">1</td>
+<td align="center">M</td>
+<td align="center">Y</td>
+<td align="center"></td>
+<td align="center">Y</td>
+</tr>
+<tr class="even">
+<td align="center"><strong>112</strong></td>
+<td align="center">&lt;65</td>
+<td align="center">1</td>
+<td align="center">WHITE</td>
+<td align="center">1</td>
+<td align="center">M</td>
+<td align="center">Y</td>
+<td align="center"></td>
+<td align="center">Y</td>
+</tr>
+<tr class="odd">
+<td align="center"><strong>148</strong></td>
+<td align="center">&lt;65</td>
+<td align="center">1</td>
+<td align="center">WHITE</td>
+<td align="center">1</td>
+<td align="center">M</td>
+<td align="center">Y</td>
+<td align="center"></td>
+<td align="center">Y</td>
+</tr>
+<tr class="even">
+<td align="center"><strong>184</strong></td>
+<td align="center">&lt;65</td>
+<td align="center">1</td>
+<td align="center">WHITE</td>
+<td align="center">1</td>
+<td align="center">M</td>
+<td align="center">Y</td>
+<td align="center"></td>
+<td align="center">Y</td>
+</tr>
+</tbody>
+</table>
+<table>
+<caption>Table continues below</caption>
+<colgroup>
+<col width="13%" />
+<col width="14%" />
+<col width="13%" />
+<col width="8%" />
+<col width="17%" />
+<col width="18%" />
+<col width="14%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="center"> </th>
+<th align="center">AVISIT</th>
+<th align="center">AVISITN</th>
+<th align="center">ADY</th>
+<th align="center">ADT</th>
+<th align="center">VISIT</th>
+<th align="center">VISITNUM</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center"><strong>4</strong></td>
+<td align="center">Baseline</td>
+<td align="center">0</td>
+<td align="center">-9</td>
+<td align="center">2013-08-14</td>
+<td align="center">SCREENING 1</td>
+<td align="center">1</td>
+</tr>
+<tr class="even">
+<td align="center"><strong>40</strong></td>
+<td align="center">Week 2</td>
+<td align="center">2</td>
+<td align="center">14</td>
+<td align="center">2013-09-05</td>
+<td align="center">WEEK 2</td>
+<td align="center">4</td>
+</tr>
+<tr class="odd">
+<td align="center"><strong>76</strong></td>
+<td align="center">Week 4</td>
+<td align="center">4</td>
+<td align="center">28</td>
+<td align="center">2013-09-19</td>
+<td align="center">WEEK 4</td>
+<td align="center">5</td>
+</tr>
+<tr class="even">
+<td align="center"><strong>112</strong></td>
+<td align="center">Week 6</td>
+<td align="center">6</td>
+<td align="center">42</td>
+<td align="center">2013-10-03</td>
+<td align="center">WEEK 6</td>
+<td align="center">7</td>
+</tr>
+<tr class="odd">
+<td align="center"><strong>148</strong></td>
+<td align="center">Week 8</td>
+<td align="center">8</td>
+<td align="center">57</td>
+<td align="center">2013-10-18</td>
+<td align="center">WEEK 8</td>
+<td align="center">8</td>
+</tr>
+<tr class="even">
+<td align="center"><strong>184</strong></td>
+<td align="center">Week 12</td>
+<td align="center">12</td>
+<td align="center">87</td>
+<td align="center">2013-11-17</td>
+<td align="center">WEEK 12</td>
+<td align="center">9</td>
+</tr>
+</tbody>
+</table>
+<table>
+<caption>Table continues below</caption>
+<colgroup>
+<col width="12%" />
+<col width="26%" />
+<col width="11%" />
+<col width="12%" />
+<col width="8%" />
+<col width="8%" />
+<col width="10%" />
+<col width="10%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="center"> </th>
+<th align="center">PARAM</th>
+<th align="center">PARAMN</th>
+<th align="center">PARCAT1</th>
+<th align="center">AVAL</th>
+<th align="center">BASE</th>
+<th align="center">CHG</th>
+<th align="center">A1LO</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center"><strong>4</strong></td>
+<td align="center">Bilirubin (umol/L)</td>
+<td align="center">21</td>
+<td align="center">CHEM</td>
+<td align="center">8.55</td>
+<td align="center">8.55</td>
+<td align="center">NA</td>
+<td align="center">3</td>
+</tr>
+<tr class="even">
+<td align="center"><strong>40</strong></td>
+<td align="center">Bilirubin (umol/L)</td>
+<td align="center">21</td>
+<td align="center">CHEM</td>
+<td align="center">8.55</td>
+<td align="center">8.55</td>
+<td align="center">0</td>
+<td align="center">3</td>
+</tr>
+<tr class="odd">
+<td align="center"><strong>76</strong></td>
+<td align="center">Bilirubin (umol/L)</td>
+<td align="center">21</td>
+<td align="center">CHEM</td>
+<td align="center">8.55</td>
+<td align="center">8.55</td>
+<td align="center">0</td>
+<td align="center">3</td>
+</tr>
+<tr class="even">
+<td align="center"><strong>112</strong></td>
+<td align="center">Bilirubin (umol/L)</td>
+<td align="center">21</td>
+<td align="center">CHEM</td>
+<td align="center">8.55</td>
+<td align="center">8.55</td>
+<td align="center">0</td>
+<td align="center">3</td>
+</tr>
+<tr class="odd">
+<td align="center"><strong>148</strong></td>
+<td align="center">Bilirubin (umol/L)</td>
+<td align="center">21</td>
+<td align="center">CHEM</td>
+<td align="center">8.55</td>
+<td align="center">8.55</td>
+<td align="center">0</td>
+<td align="center">3</td>
+</tr>
+<tr class="even">
+<td align="center"><strong>184</strong></td>
+<td align="center">Bilirubin (umol/L)</td>
+<td align="center">21</td>
+<td align="center">CHEM</td>
+<td align="center">6.84</td>
+<td align="center">8.55</td>
+<td align="center">-1.71</td>
+<td align="center">3</td>
+</tr>
+</tbody>
+</table>
+<table style="width:100%;">
+<caption>Table continues below</caption>
+<colgroup>
+<col width="13%" />
+<col width="9%" />
+<col width="11%" />
+<col width="11%" />
+<col width="13%" />
+<col width="13%" />
+<col width="13%" />
+<col width="14%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="center"> </th>
+<th align="center">A1HI</th>
+<th align="center">R2A1LO</th>
+<th align="center">R2A1HI</th>
+<th align="center">BR2A1LO</th>
+<th align="center">BR2A1HI</th>
+<th align="center">ANL01FL</th>
+<th align="center">ALBTRVAL</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center"><strong>4</strong></td>
+<td align="center">21</td>
+<td align="center">2.85</td>
+<td align="center">0.4071</td>
+<td align="center">2.85</td>
+<td align="center">0.4071</td>
+<td align="center"></td>
+<td align="center">22.95</td>
+</tr>
+<tr class="even">
+<td align="center"><strong>40</strong></td>
+<td align="center">21</td>
+<td align="center">2.85</td>
+<td align="center">0.4071</td>
+<td align="center">2.85</td>
+<td align="center">0.4071</td>
+<td align="center"></td>
+<td align="center">22.95</td>
+</tr>
+<tr class="odd">
+<td align="center"><strong>76</strong></td>
+<td align="center">21</td>
+<td align="center">2.85</td>
+<td align="center">0.4071</td>
+<td align="center">2.85</td>
+<td align="center">0.4071</td>
+<td align="center"></td>
+<td align="center">22.95</td>
+</tr>
+<tr class="even">
+<td align="center"><strong>112</strong></td>
+<td align="center">21</td>
+<td align="center">2.85</td>
+<td align="center">0.4071</td>
+<td align="center">2.85</td>
+<td align="center">0.4071</td>
+<td align="center"></td>
+<td align="center">22.95</td>
+</tr>
+<tr class="odd">
+<td align="center"><strong>148</strong></td>
+<td align="center">21</td>
+<td align="center">2.85</td>
+<td align="center">0.4071</td>
+<td align="center">2.85</td>
+<td align="center">0.4071</td>
+<td align="center"></td>
+<td align="center">22.95</td>
+</tr>
+<tr class="even">
+<td align="center"><strong>184</strong></td>
+<td align="center">21</td>
+<td align="center">2.28</td>
+<td align="center">0.3257</td>
+<td align="center">2.85</td>
+<td align="center">0.4071</td>
+<td align="center">Y</td>
+<td align="center">24.66</td>
+</tr>
+</tbody>
+</table>
+<table style="width:100%;">
+<caption>Table continues below</caption>
+<colgroup>
+<col width="12%" />
+<col width="11%" />
+<col width="11%" />
+<col width="9%" />
+<col width="13%" />
+<col width="9%" />
+<col width="12%" />
+<col width="19%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="center"> </th>
+<th align="center">ANRIND</th>
+<th align="center">BNRIND</th>
+<th align="center">ABLFL</th>
+<th align="center">AENTMTFL</th>
+<th align="center">LBSEQ</th>
+<th align="center">DATASET</th>
+<th align="center">LBSTRESN.BILI</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center"><strong>4</strong></td>
+<td align="center">N</td>
+<td align="center">N</td>
+<td align="center">Y</td>
+<td align="center"></td>
+<td align="center">6</td>
+<td align="center">ADLBC</td>
+<td align="center">8.55</td>
+</tr>
+<tr class="even">
+<td align="center"><strong>40</strong></td>
+<td align="center">N</td>
+<td align="center">N</td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center">43</td>
+<td align="center">ADLBC</td>
+<td align="center">8.55</td>
+</tr>
+<tr class="odd">
+<td align="center"><strong>76</strong></td>
+<td align="center">N</td>
+<td align="center">N</td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center">78</td>
+<td align="center">ADLBC</td>
+<td align="center">8.55</td>
+</tr>
+<tr class="even">
+<td align="center"><strong>112</strong></td>
+<td align="center">N</td>
+<td align="center">N</td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center">108</td>
+<td align="center">ADLBC</td>
+<td align="center">8.55</td>
+</tr>
+<tr class="odd">
+<td align="center"><strong>148</strong></td>
+<td align="center">N</td>
+<td align="center">N</td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center">138</td>
+<td align="center">ADLBC</td>
+<td align="center">8.55</td>
+</tr>
+<tr class="even">
+<td align="center"><strong>184</strong></td>
+<td align="center">N</td>
+<td align="center">N</td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center">168</td>
+<td align="center">ADLBC</td>
+<td align="center">6.84</td>
+</tr>
+</tbody>
+</table>
+<table style="width:76%;">
+<colgroup>
+<col width="13%" />
+<col width="20%" />
+<col width="20%" />
+<col width="20%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="center"> </th>
+<th align="center">LBNRIND.BILI</th>
+<th align="center">LBSTRESN.ALT</th>
+<th align="center">LBNRIND.ALT</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center"><strong>4</strong></td>
+<td align="center">NORMAL</td>
+<td align="center">34</td>
+<td align="center">NORMAL</td>
+</tr>
+<tr class="even">
+<td align="center"><strong>40</strong></td>
+<td align="center">NORMAL</td>
+<td align="center">41</td>
+<td align="center">NORMAL</td>
+</tr>
+<tr class="odd">
+<td align="center"><strong>76</strong></td>
+<td align="center">NORMAL</td>
+<td align="center">35</td>
+<td align="center">NORMAL</td>
+</tr>
+<tr class="even">
+<td align="center"><strong>112</strong></td>
+<td align="center">NORMAL</td>
+<td align="center">31</td>
+<td align="center">NORMAL</td>
+</tr>
+<tr class="odd">
+<td align="center"><strong>148</strong></td>
+<td align="center">NORMAL</td>
+<td align="center">31</td>
+<td align="center">NORMAL</td>
+</tr>
+<tr class="even">
+<td align="center"><strong>184</strong></td>
+<td align="center">NORMAL</td>
+<td align="center">39</td>
+<td align="center">NORMAL</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="process-data" class="section level1" number="5">
+<h1 number="5"><span class="header-section-number">5</span> Process data</h1>
+<p>The <code>processData</code> function executes all the pre-processing steps described in the previous section at once.</p>
+<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true"></a>dataLBAnnotTreatment2 &lt;-<span class="st"> </span><span class="kw">processData</span>(</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true"></a>    <span class="dt">data =</span> dataLB,</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true"></a>    <span class="dt">processing =</span> <span class="kw">list</span>(</span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true"></a>        <span class="kw">list</span>(<span class="dt">annotate =</span> <span class="kw">list</span>(<span class="dt">data =</span> dataDM, <span class="dt">vars =</span> <span class="kw">c</span>(<span class="st">&quot;ETHNIC&quot;</span>, <span class="st">&quot;ARM&quot;</span>))),</span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true"></a>        <span class="kw">list</span>(<span class="dt">filter =</span> <span class="kw">list</span>(<span class="dt">var =</span> <span class="st">&quot;ARM&quot;</span>, <span class="dt">value =</span> <span class="st">&quot;Placebo&quot;</span>, <span class="dt">rev =</span> <span class="ot">TRUE</span>))</span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true"></a>    ),</span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true"></a>    <span class="dt">verbose =</span> <span class="ot">TRUE</span></span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true"></a>)</span>
+<span id="cb15-9"><a href="#cb15-9" aria-hidden="true"></a></span>
+<span id="cb15-10"><a href="#cb15-10" aria-hidden="true"></a><span class="kw">identical</span>(dataLBAnnotTreatment, dataLBAnnotTreatment2)</span></code></pre></div>
+<p>[1] TRUE</p>
+</div>
+<div id="appendix" class="section level1" number="6">
+<h1 number="6"><span class="header-section-number">6</span> Appendix</h1>
+<div id="session-info" class="section level2" number="6.1">
+<h2 number="6.1"><span class="header-section-number">6.1</span> Session info</h2>
+<p><strong>R version 4.1.0 (2021-05-18)</strong></p>
+<p><strong>Platform:</strong> x86_64-pc-linux-gnu (64-bit)</p>
+<p><strong>locale:</strong> <em>LC_CTYPE=en_US.UTF-8</em>, <em>LC_NUMERIC=C</em>, <em>LC_TIME=en_GB.UTF-8</em>, <em>LC_COLLATE=en_US.UTF-8</em>, <em>LC_MONETARY=en_GB.UTF-8</em>, <em>LC_MESSAGES=en_US.UTF-8</em>, <em>LC_PAPER=en_GB.UTF-8</em>, <em>LC_NAME=C</em>, <em>LC_ADDRESS=C</em>, <em>LC_TELEPHONE=C</em>, <em>LC_MEASUREMENT=en_GB.UTF-8</em> and <em>LC_IDENTIFICATION=C</em></p>
+<p><strong>attached base packages:</strong> <em>stats</em>, <em>graphics</em>, <em>grDevices</em>, <em>utils</em>, <em>datasets</em>, <em>methods</em> and <em>base</em></p>
+<p><strong>other attached packages:</strong> <em>clinUtils(v.0.0.1)</em>, <em>clinDataReview(v.1.0.0)</em>, <em>pander(v.0.6.3)</em> and <em>knitr(v.1.33)</em></p>
+<p><strong>loaded via a namespace (and not attached):</strong> <em>tidyselect(v.1.1.1)</em>, <em>xfun(v.0.23)</em>, <em>bslib(v.0.2.5.1)</em>, <em>purrr(v.0.3.4)</em>, <em>haven(v.2.4.1)</em>, <em>V8(v.3.4.2)</em>, <em>colorspace(v.2.0-1)</em>, <em>vctrs(v.0.3.8)</em>, <em>generics(v.0.1.0)</em>, <em>htmltools(v.0.5.1.1)</em>, <em>viridisLite(v.0.4.0)</em>, <em>yaml(v.2.2.1)</em>, <em>utf8(v.1.2.1)</em>, <em>plotly(v.4.9.3)</em>, <em>rlang(v.0.4.11)</em>, <em>jquerylib(v.0.1.4)</em>, <em>pillar(v.1.6.1)</em>, <em>glue(v.1.4.2)</em>, <em>lifecycle(v.1.0.0)</em>, <em>plyr(v.1.8.6)</em>, <em>stringr(v.1.4.0)</em>, <em>munsell(v.0.5.0)</em>, <em>gtable(v.0.3.0)</em>, <em>htmlwidgets(v.1.5.3)</em>, <em>evaluate(v.0.14)</em>, <em>forcats(v.0.5.1)</em>, <em>crosstalk(v.1.1.1)</em>, <em>curl(v.4.3.1)</em>, <em>fansi(v.0.5.0)</em>, <em>Rcpp(v.1.0.6)</em>, <em>scales(v.1.1.1)</em>, <em>DT(v.0.18)</em>, <em>jsonvalidate(v.1.1.0)</em>, <em>jsonlite(v.1.7.2)</em>, <em>ggplot2(v.3.3.3)</em>, <em>hms(v.1.1.0)</em>, <em>digest(v.0.6.27)</em>, <em>stringi(v.1.6.2)</em>, <em>bookdown(v.0.22)</em>, <em>dplyr(v.1.0.6)</em>, <em>grid(v.4.1.0)</em>, <em>tools(v.4.1.0)</em>, <em>magrittr(v.2.0.1)</em>, <em>sass(v.0.4.0)</em>, <em>lazyeval(v.0.2.2)</em>, <em>tibble(v.3.1.2)</em>, <em>crayon(v.1.4.1)</em>, <em>tidyr(v.1.1.3)</em>, <em>pkgconfig(v.2.0.3)</em>, <em>ellipsis(v.0.3.2)</em>, <em>data.table(v.1.14.0)</em>, <em>rmarkdown(v.2.8)</em>, <em>httr(v.1.4.2)</em>, <em>R6(v.2.5.0)</em> and <em>compiler(v.4.1.0)</em></p>
+</div>
+</div>
+
+
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
