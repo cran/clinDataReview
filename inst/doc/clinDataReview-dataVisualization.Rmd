@@ -81,7 +81,10 @@ template report available in the `clinDataReview` package.
 A simple patient profile report for each subject in the example
 dataset is created below.
 
-```{r createPatientProfiles, results = "hide"}
+Please note that the patient profiles are only created if Pandoc
+is available.
+
+```{r createPatientProfiles, results = "hide", eval = rmarkdown::pandoc_available()}
 # create a directory to store the patient profiles:
 patientProfilesDir <- "patientProfiles"
 dir.create(patientProfilesDir)
@@ -391,8 +394,11 @@ dataAE$patientProfileLink <- with(dataAE,
     )
 )
 
-# combine all paths across patients
-# the paths should be collapsed with: ', '
+# Specify extra summarizations besides the standard stats
+# When the data is summarized,
+# the patient profile path are summarized
+# as well across patients
+# (the paths should be collapsed with: ', ')
 statsExtraPP <- list(
     statPatientProfilePath = function(data)	
       toString(sort(unique(data$patientProfilePath))),
@@ -418,8 +424,10 @@ tableAE <- getSummaryStatisticsTable(
     rowOrder = "total",
     labelVars = labelVars,
     
-    # plotly treemap requires records (rows) for each group
-    rowVarTotalInclude = "AEDECOD",
+    # The total across the variable used for the nodes
+	# should be specified (rowVarTotalInclude = 'AEDECOD')
+	# The total across the other variable(s) is optional
+    rowVarTotalInclude = c("AESOC", "AEDECOD"),
     
     ## DT-output specific:
     outputType = "data.frame-base",
@@ -478,7 +486,6 @@ Note, that a treemap can also be colored accordingly to a meaningful
 variable. For instance, if we show adverse events, we might **color the plot by
 severity**. This can be achieved with the **colorVar** parameter.
 
-
 ```{r treemap}
 
 dataTreemap <- tableAE
@@ -521,6 +528,39 @@ barplotClinData(
     table = FALSE,
     verbose = TRUE,
     barmode = "stack"
+)
+
+```
+
+### Boxplot
+
+A boxplot visualizes the distribution of a continuous variable of interest
+versus specific categorical variables.
+
+```{r boxplot}
+
+dataPlot <- subset(dataADaMCDISCP01$ADVS, 
+	PARAMCD == "DIABP" & ANL01FL == "Y" &
+	AVISIT %in% c("Baseline", "Week 2", "Week 4", "Week 6", "Week 8")
+)
+# link to patient profiles
+dataPlot$patientProfilePath <- paste0(
+	"patientProfiles/subjectProfile-", 
+	sub("/", "-", dataPlot$USUBJID), ".pdf"
+)
+
+boxplotClinData(
+	data = dataPlot,
+	xVar = "AVISIT", 
+	yVar = "AVAL",
+	colorVar = "TRTA",
+	facetVar = "ATPT",
+	title = "Diastolic Blood Pressure distribution by actual visit and analysis timepoint",
+	yLab = "Actual value of the Diastolic Blood Pressure parameter (mmHg)",
+	labelVars = labelVars,
+	pathVar = "patientProfilePath",
+	pathLab = clinUtils::getLabelVar(var = "USUBJID", labelVars = labelVars),
+	table = FALSE
 )
 
 ```

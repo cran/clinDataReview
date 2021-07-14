@@ -63,6 +63,7 @@ This report displays a listing of the variables and data of interest, displayed 
 \item{\code{comparisonTableParams}: }{(optional) object , parameters for the comparison table, passed to \link[clinUtils]{compareTables}}
 \item{\code{loopingVar}: }{(optional) array or string , data variable(s) to loop over, for which each output should be created}
 \item{\code{loopingNMax}: }{(optional) integer , maximum number of elements of \code{loopingVar} to include in the report}
+\item{\code{listingDocx}: }{(optional) boolean , export listing to Word}
 }
 }
 \section{Clinical data template for the creation of patient profiles : patientProfilesTemplate}{
@@ -94,7 +95,7 @@ This report visualizes input data with a function of the clinical data review pa
 \item{\code{reportTitleLevel}: }{(optional) integer , header level, 1 by default (1: 'chapter', '2': 'section', '3': subsection, ...)}
 \item{\strong{\code{dataFileName}}: }{string , name of the data file of interest}
 \item{\code{dataProcessing}: }{(optional) array , data processing parameters, passed to \link[clinDataReview]{processData}}
-\item{\strong{\code{plotFunction}}: }{string among: \emph{ 'timeProfileIntervalPlot', 'scatterplotClinData' } , plotting function of the package to consider}
+\item{\strong{\code{plotFunction}}: }{string among: \emph{ 'timeProfileIntervalPlot', 'scatterplotClinData', 'boxplotClinData' } , plotting function of the package to consider}
 \item{\strong{\code{plotParams}}: }{object , parameters for the plotting function. Parameters depending on the dataset of interest can be specified as:\cr\code{[parameterName]: !r-lazy [dataI]}}
 \item{\code{comparisonTableType}: }{(optional) string among: \emph{ 'none', 'newData-diff' } , output type of the comparison table. If specified, an additional column: 'Comparison Type' is included in the table attached to the plot.}
 \item{\code{comparisonTableParams}: }{(optional) object , parameters for the comparison table, passed to \link[clinUtils]{compareTables}. If referenceVars is not specified, all variables displayed in the plot are used.}
@@ -138,7 +139,7 @@ This report summarizes the data of interest (with the \code{inTextSummaryTable} 
 \item{\strong{\code{tableParams}}: }{object , parameters to summarize the data in a table, passed to \link[inTextSummaryTable]{computeSummaryStatisticsTable}}
 \item{\code{tableParamsDocx}: }{(optional) object , parameters to format the table to the docx format, passed to \link[inTextSummaryTable]{exportSummaryStatisticsTable}}
 \item{\code{tableParamsDT}: }{(optional) object , parameters to format the table to the DT interactive table included in the report, passed to \link[inTextSummaryTable]{exportSummaryStatisticsTable}}
-\item{\code{comparisonTableType}: }{(optional) string among: \emph{ 'none', 'table-comparison-interactive' } , output type of the comparison table}
+\item{\code{comparisonTableType}: }{(optional) string among: \emph{ 'none', 'table-comparison-interactive', 'newData-diff' } , output type of the comparison table}
 \item{\code{comparisonTableParams}: }{(optional) object , parameters for the comparison table, passed to \link[clinUtils]{compareTables}. By default, statistics variables are compared across row and column elements.}
 \item{\code{loopingVar}: }{(optional) array or string , data variable(s) to loop over, for which each output should be created}
 \item{\code{loopingNMax}: }{(optional) integer , maximum number of elements of \code{loopingVar} to include in the report}
