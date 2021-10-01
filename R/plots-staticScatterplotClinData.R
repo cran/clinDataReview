@@ -21,6 +21,13 @@
 #' \code{\link[ggplot2]{scale_x_continuous}}/
 #' \code{\link[ggplot2]{scale_y_continuous}} functions,
 #' besides \code{trans} and \code{limits}.
+#' @param xLabVars Character vector with variable(s) to be displayed 
+#' as the labels of the ticks in the x-axis.\cr
+#' By default, \code{xVar} is displayed.\cr
+#' If specified, this overwrites any \code{labels} specified via \code{xPars}.\cr
+#' In case the variable(s) contain different elements 
+#' by \code{xVar} or between facets, they are combined
+#' and displayed below each other.
 #' @param xLimExpandData,yLimExpandData Logical (TRUE by default), should the
 #' limits specified via \code{xLim}/\code{yLim} be 
 #' expanded to include any data points outside of these
@@ -45,6 +52,7 @@
 #' @return \code{\link[ggplot2]{ggplot}} object
 #' @importFrom ggplot2 sym ggplot aes geom_point geom_col geom_line 
 #' scale_discrete_manual scale_x_continuous scale_y_continuous 
+#' scale_x_discrete scale_y_discrete
 #' labs ggtitle facet_wrap facet_grid theme_bw theme
 #' @importFrom clinUtils getLabelVar
 #' @importFrom stats setNames
@@ -62,6 +70,7 @@ staticScatterplotClinData <- function(
 	# axis specification:
 	xTrans = "identity", yTrans = "identity",
 	xPars = list(), yPars = list(),
+	xLabVars = NULL,
 	yLim = NULL, xLim = NULL, 
 	yLimExpandData = TRUE, xLimExpandData = TRUE,
 	# general plot:
@@ -143,14 +152,28 @@ staticScatterplotClinData <- function(
 	## scatterplot
 	if(length(aesPointVar) > 0)
 		aesPointVar <- sapply(aesPointVar, sym, simplify = FALSE)
-	aesGeom <- c(aesPointVar, if(!is.null(hoverVars))	list(text = sym("hover")))
+	aesGeom <- c(aesPointVar, 
+		if(!is.null(hoverVars))	
+			list(text = sym("hover"))
+	)
 	argsGeom <- c(
 		list(mapping = do.call(aes, aesGeom)),
 		geomAes[c("color", "colour", "fill", "shape")]
 	)
 	argsGeom <- Filter(Negate(is.null), argsGeom)
 	geomFct <- switch(geomType, point = geom_point, col = geom_col)
-	gg <- gg + do.call(geomFct, argsGeom)
+	
+	# Expected warning:
+	# Hover is set via the 'text' aesthetic in ggplot
+	# to have it available in plotly
+	# but text aesthetic is not used by geom_point
+	gg <- withCallingHandlers(
+		expr = {gg + do.call(geomFct, argsGeom)},
+		warning = function(w){
+			if(grepl("unknown aesthetics.+text", conditionMessage(w)))
+				invokeRestart("muffleWarning")
+		}
+	)
 	
 	# aesthetic scales
 	for(scaleParsI in scalePars){
@@ -158,6 +181,21 @@ staticScatterplotClinData <- function(
 	}
 	
 	# axis specification
+	if(!is.null(xLabVars)){
+		
+		xAxisLabs <- getAxisLabs(
+			data = dataContent, 
+			var = xVar, 
+			labVars = xLabVars
+		)
+		
+		if(!is.null(xPars$labels))
+			warning("Specified labels for the x-axis (in xPars) are overwritten",
+				"to include the specified variables for the x-axis (xAxisLabs).")
+		xPars$labels <- xAxisLabs
+		
+	}
+
 	setAxis <- function(gg, trans, pars, lims, axis){
 		if(trans != "identity"){
 			if("trans" %in% names(pars))
@@ -173,8 +211,16 @@ staticScatterplotClinData <- function(
 		}
 		if(length(pars) > 0){
 			scaleFct <- switch(axis,
-				x = scale_x_continuous,
-				y = scale_y_continuous
+				x = if(is.numeric(dataContent[, xVar])){
+					scale_x_continuous
+				}else{
+					scale_x_discrete
+				},
+				y = if(is.numeric(dataContent[, yVar])){
+					scale_y_continuous
+				}else{
+					scale_y_discrete
+				}
 			)
 			gg <- gg + do.call(scaleFct, pars)
 		}
@@ -192,6 +238,8 @@ staticScatterplotClinData <- function(
 	if(!is.null(title))
 		gg <- gg + ggtitle(title)
 	
+	metadata <- list()
+	
 	# facetting:
 	if(length(facetPars) > 0){
 		
@@ -203,7 +251,10 @@ staticScatterplotClinData <- function(
 			grid = facet_grid
 		)
 		gg <- gg + do.call(facetFct, facetPars)
-	}
+		
+		metadata <- facetPars[c("nrow", "ncol")]
+		
+	}else	metadata <- list(nrow = 1, ncol = 1)
 	
 	# theme:
 	gg <- gg + theme_bw()
@@ -217,6 +268,8 @@ staticScatterplotClinData <- function(
 		xVar = xVar, yVar = yVar, 
 		refLinePars = refLinePars, facetPars = facetPars
 	)
+	
+	attr(gg, "metaData") <- metadata
 	
 	return(gg)
 	

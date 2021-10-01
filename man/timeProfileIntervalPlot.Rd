@@ -20,12 +20,14 @@ timeProfileIntervalPlot(
   timeEndShapeLab = getLabelVar(timeEndShapeVar, labelVars = labelVars),
   shapePalette = NULL,
   colorVar = NULL,
-  colorLab = getLabelVar(timeStartShapeVar, labelVars = labelVars),
+  colorLab = getLabelVar(colorVar, labelVars = labelVars),
   colorPalette = NULL,
   alpha = 1,
   yLab = NULL,
   xLab = paste(c(timeStartLab, timeEndLab), collapse = " and "),
   title = NULL,
+  subtitle = NULL,
+  caption = NULL,
   labelVars = NULL,
   width = 800,
   height = NULL,
@@ -81,7 +83,7 @@ of the end of the time interval.}
 
 \item{colorVar}{(optional) String with color variable.}
 
-\item{colorLab}{(optional) String with label for \code{colorVar}.}
+\item{colorLab}{String with label for \code{colorVar}.}
 
 \item{colorPalette}{(optional) Named character vector with color palette.
 If not specified, the viridis color palette is used.\cr
@@ -92,6 +94,15 @@ See \code{\link[clinUtils]{clinColors}}.}
 \item{xLab, yLab}{(optional) String with labels for the x/y-axis.}
 
 \item{title}{String with title for the plot.}
+
+\item{subtitle}{String with subtitle.\cr
+The subtitle is included at the top left of the plot,
+below the title.}
+
+\item{caption}{String with caption. \cr
+The caption is included at the bottom right of the plot.
+Please note that this might overlap with 
+vertical or rotated x-axis labels.}
 
 \item{labelVars}{Named character vector containing variable labels.}
 
@@ -161,11 +172,11 @@ of subject-specific report are displayed in the browser console.}
 \value{
 Either:
 \itemize{
-\item{if \code{table} is requested}{
+\item{if a \code{table} is requested: }{
 a \code{clinDataReview} object, a.k.a a list with the 
 'plot' (\code{\link[plotly]{plotly}} object) and 'table'
 (\code{\link[DT]{datatable}} object)}
-\item{otherwise: }{\code{\link[plotly]{plotly}} object}
+\item{otherwise: }{a \code{\link[plotly]{plotly}} object}
 }
 }
 \description{

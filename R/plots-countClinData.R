@@ -5,7 +5,6 @@
 #' @param colorVar (optional) String with coloring variable
 #' (NULL by default).
 #' By default, the treemap is colored based by section.
-#' @param colorLab (optional) String with label for \code{colorVar}.
 #' @param colorRange (optional) Numeric vector of length 2 with range 
 #' for the color variable, in case it is a numeric variable.
 #' @inheritParams clinDataReview-common-args-summaryStatsVis
@@ -34,6 +33,7 @@ plotCountClinData <- function(
         paste(valueLab, "by", paste(varsLab, collapse = " and "), 
             titleExtra), collapse = "<br>"
     ),
+	subtitle = NULL, caption = NULL,
     labelVars = NULL,
     # interactivity:
     width = NULL, height = NULL,
@@ -95,12 +95,15 @@ plotCountClinData <- function(
   )
   
   # get plot dim
-  dimPlot <- getSizePlotClinData(
+  dimPlot <- getSizePlot(
       width = width, height = height,
-      legend = FALSE
+      includeLegend = FALSE,
+	  title = title,
+	  subtitle = subtitle,
+	  caption = caption
   )
-  width <- unname(dimPlot["width"])
-  height <- unname(dimPlot["height"])
+  width <- dimPlot[["width"]]
+  height <- dimPlot[["height"]]
   
   # get color vector
   colorPaletteOpt <- colorPalette
@@ -155,13 +158,24 @@ plotCountClinData <- function(
       width = width, height = height,
       textinfo = "label"
   )
-  pl <- pl %>% layout(
-      title = title, 
-      # remove the axis labels, included when color is specified in the treemap:
-      xaxis = list(showticklabels = FALSE),
-      yaxis = list(showticklabels = FALSE),
-      legend = list(title = list(text = colorLab))# not yet available in plotly for treemap?
-  )
+  
+	pl <- layoutClinData(
+		p = pl,
+		title = title,
+		subtitle = subtitle,
+		caption = caption,
+		includeLegend = FALSE,
+		# fix for partial matching of args (legend <-> legendPosition)
+		legendPosition = "none",
+		width = width,
+		height = height,
+		# extra params passed to plotly::layout
+		# remove the axis labels, included when color is specified in the treemap:
+		xaxis = list(showticklabels = FALSE),
+		yaxis = list(showticklabels = FALSE),
+		# extra params passed to plotly::layout
+		legend = list(title = list(text = colorLab))
+	)
   
   # current hovered element identified by d.points[0].label
   

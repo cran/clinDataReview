@@ -18,6 +18,8 @@ plotCountClinData(
   titleExtra = NULL,
   title = paste(paste(valueLab, "by", paste(varsLab, collapse = " and "), titleExtra),
     collapse = "<br>"),
+  subtitle = NULL,
+  caption = NULL,
   labelVars = NULL,
   width = NULL,
   height = NULL,
@@ -54,7 +56,7 @@ and associated label.}
 (NULL by default).
 By default, the treemap is colored based by section.}
 
-\item{colorLab}{(optional) String with label for \code{colorVar}.}
+\item{colorLab}{String with label for \code{colorVar}.}
 
 \item{colorPalette}{(optional) Named character vector with color palette.
 If not specified, the viridis color palette is used.\cr
@@ -71,6 +73,15 @@ or 'relative'.}
 \item{titleExtra}{String with extra title for the plot (appended after \code{title}).}
 
 \item{title}{String with title for the plot.}
+
+\item{subtitle}{String with subtitle.\cr
+The subtitle is included at the top left of the plot,
+below the title.}
+
+\item{caption}{String with caption. \cr
+The caption is included at the bottom right of the plot.
+Please note that this might overlap with 
+vertical or rotated x-axis labels.}
 
 \item{labelVars}{Named character vector containing variable labels.}
 
@@ -134,11 +145,11 @@ of subject-specific report are displayed in the browser console.}
 \value{
 Either:
 \itemize{
-\item{if \code{table} is requested}{
+\item{if a \code{table} is requested: }{
 a \code{clinDataReview} object, a.k.a a list with the 
 'plot' (\code{\link[plotly]{plotly}} object) and 'table'
 (\code{\link[DT]{datatable}} object)}
-\item{otherwise: }{\code{\link[plotly]{plotly}} object}
+\item{otherwise: }{a \code{\link[plotly]{plotly}} object}
 }
 }
 \description{
@@ -148,6 +159,7 @@ Note: the table and plot are not (yet) linked.
 Other visualizations of summary statistics for clinical data: 
 \code{\link{barplotClinData}()},
 \code{\link{boxplotClinData}()},
+\code{\link{errorbarClinData}()},
 \code{\link{sunburstClinData}()},
 \code{\link{treemapClinData}()}
 }

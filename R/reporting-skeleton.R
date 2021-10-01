@@ -21,21 +21,20 @@ createClinDataReviewReportSkeleton <- function(dir = ".") {
   
   if(!dir.exists(dir))	dir.create(dir, recursive = TRUE)
   preexistingFiles <- list.files(dir)
-  if(length(preexistingFiles) > 0) warning("'", dir, "' is not empty. Files might be overwritten.")
+  if(length(preexistingFiles) > 0)
+	  warning("'", dir, "' is not empty. Files might be overwritten.")
   
   dirData <- file.path(dir, "data")
-  dirComparisonData <- file.path(dirData, "comparisonData")
-  dirConfig <- file.path(dir, "config")
-  if(length(preexistingFiles) == 0) {
-    if(! any(grepl("data", preexistingFiles))) dir.create(dirData)
-    if(! any(grepl("comparisonData", preexistingFiles))) dir.create(dirComparisonData)
-    if(! any(grepl("config", preexistingFiles))) dir.create(dirConfig)
-  }
+  if(!dir.exists(dirData))	dir.create(dirData)
   
   moveXpt(dirData)
   createExampleMetadata(dirData)
+  
+  dirComparisonData <- file.path(dirData, "comparisonData")
   createComparisonData(dirComparisonData)
   
+  dirConfig <- file.path(dir, "config")
+  if(!dir.exists(dirConfig))	dir.create(dirConfig)
   createMainConfigSkeleton(dir = dirConfig, dirData = dirData)
   moveSkeletonFiles(dir)
   
@@ -106,20 +105,37 @@ createExampleMetadata <- function(dir) {
 #' @importFrom haven write_xpt
 #' @importFrom clinUtils loadDataADaMSDTM
 createComparisonData <- function(dir) {
+	
+	if(!dir.exists(dir))	dir.create(dir, recursive = TRUE)
   
-  pathToFile <- system.file(
-      "extdata", "cdiscpilot01",
-      "SDTM", "ae.xpt",
-      package = "clinUtils"
-  )
-  data <- suppressMessages(
-      loadDataADaMSDTM(files = pathToFile)
-  )
-  dataAE <- data[[1]]
-  idx <- which(dataAE$USUBJID == "01-701-1148")
-  dataAE$AESER[idx] <- "Y"
-  dataAE$AESEV[idx] <- "SEVERE"
-  write_xpt(dataAE, file.path(dir, "ae.xpt"))
+	# Adverse events
+	pathToFile <- system.file(
+		"extdata", "cdiscpilot01",
+		"SDTM", "ae.xpt",
+		package = "clinUtils"
+	)
+	data <- suppressMessages(
+		loadDataADaMSDTM(files = pathToFile)
+	)
+	dataAE <- data[[1]]
+	dataAE <- dataAE[which(dataAE$USUBJID != "01-718-1427"), ]
+	idx <- which(dataAE$USUBJID == "01-701-1148")
+	dataAE$AESER[idx] <- "Y"
+	dataAE$AESEV[idx] <- "SEVERE"
+	write_xpt(dataAE, file.path(dir, "ae.xpt"))
+  
+	# dm
+	pathToFile <- system.file(
+		"extdata", "cdiscpilot01",
+		"SDTM", "dm.xpt",
+		package = "clinUtils"
+	)
+	data <- suppressMessages(
+		loadDataADaMSDTM(files = pathToFile)
+	)
+	dataDM <- data[[1]]
+	dataDM <- dataDM[which(dataDM$USUBJID != "01-718-1427"), ]
+	write_xpt(dataDM, file.path(dir, "dm.xpt"))
   
 }
 
@@ -182,14 +198,16 @@ createMainConfigSkeleton <- function(dir, dirData) {
 			  "config-demographics-summaryTable.yml",
               "config-adverseEvents-division.yml",
               "config-adverseEvents-summaryTable.yml",
+			  "config-adverseEvents-summaryTable-comparison.yml",
               "config-adverseEvents-all-countsVisualization.yml",
-              "config-adverseEvents-timeProfiles.yml",
-              "config-adverseEvents-listing-comparison.yml",
+			  "config-adverseEvents-listing-comparison.yml",
+			  "config-adverseEvents-timeProfiles.yml",
               "config-concomitantMedications-division.yml",
               "config-concomitantMedications-listing.yml",
 			  "config-laboratory-summaryBarplot.yml",
               "config-laboratory-eDISH-ALT.yml",
-              "config-laboratory-spaghettiPlot.yml"
+              "config-laboratory-spaghettiPlot.yml",
+			  "config-laboratory-spaghettiPlot-byVisit.yml"
           )
       ),
       fileName

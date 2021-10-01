@@ -7,6 +7,8 @@ output:
     toc: true
     toc_depth: 5
     number_sections: true
+params:
+  patientProfilesCreate: FALSE
 vignette: >
   %\VignetteIndexEntry{Visualization of clinical data}
   %\VignetteEngine{knitr::rmarkdown}
@@ -39,6 +41,14 @@ preprocessing available at:
 [here](../doc/clinDataReview-dataPreprocessing.html).
 
 If everything is clear on that side, let's get started!
+
+Please note that the patient profiles and interactive
+visualizations are only displayed in the vignette
+if Pandoc is available.
+
+```{r checkPandocAvailability, echo = FALSE}
+hasPandoc <- rmarkdown::pandoc_available()
+```
 
 ```{r loadLibraries}
 
@@ -81,10 +91,7 @@ template report available in the `clinDataReview` package.
 A simple patient profile report for each subject in the example
 dataset is created below.
 
-Please note that the patient profiles are only created if Pandoc
-is available.
-
-```{r createPatientProfiles, results = "hide", eval = rmarkdown::pandoc_available()}
+```{r patientProfilesCreate, results = "hide", eval = hasPandoc & params$patientProfilesCreate}
 # create a directory to store the patient profiles:
 patientProfilesDir <- "patientProfiles"
 dir.create(patientProfilesDir)
@@ -106,6 +113,7 @@ params$patientProfilePath <- patientProfilesDir
 pathTemplate <- clinDataReview::getPathTemplate(params$template)
 file.copy(from = pathTemplate, to = ".")
 report <- rmarkdown::render(input = basename(pathTemplate), envir = new.env())
+rm(basename(pathTemplate))
 ```
 
 Please refer to the vignette about reporting for more details on how 
@@ -150,7 +158,7 @@ table, the specific patient profile is opened in a new window in the browser**.
 
 ### Spaghetti plot of time profile
 
-```{r timeProfiles}
+```{r timeProfiles, eval = hasPandoc}
 
 labParam <- "ALT"
 dataPlot <- subset(dataLB, PARAMCD == labParam)
@@ -180,15 +188,21 @@ scatterplotClinData(
     ),
     # include link to patient profiles:
     pathVar = "patientProfilePath",
-    table = FALSE, id = paste("subjectProfile", labParam, sep = "-"),
-    verbose = TRUE
+	subtitle = paste(
+		"Profile plot by subject",
+		"Points are positioned at relative day",
+		"Visits are positioned based on median relative day across subjects.",
+		sep = "\n"
+	),
+	verbose = TRUE,
+    table = FALSE
 )
 
 ```
 
 ### Scatterplot
 
-```{r scatterplot}
+```{r scatterplot, eval = hasPandoc}
 
 # format data long -> wide format (one column per lab param)
 dataPlot <- subset(dataLB, PARAMCD %in% c("ALT", "ALB"))
@@ -220,15 +234,14 @@ scatterplotClinData(
     facetPars = list(facets = ~ VISIT),
     labelVars = labelVars,
     pathVar = "patientProfilePath",
-    table = FALSE,
-    verbose = TRUE
+    table = FALSE
 )
 
 ```
 
 ### eDish plot
 
-```{r eDishPlot}
+```{r eDishPlot, eval = hasPandoc}
 
 dataALT <- subset(dataLB, PARAMCD == "ALT")
 dataBILI <- subset(dataLB, PARAMCD == "BILI")
@@ -267,12 +280,10 @@ scatterplotClinData(
     ),
     aesPointVar = list(color = "VISIT", fill = "VISIT"),
     xTrans = "log10", yTrans = "log10",
-    hoverVars = c("USUBJID"),
-    themePars = list(legend.position = "bottom"),
+    hoverVars = "USUBJID",
     labelVars = labelVars,
-    table = FALSE, id = "eDish",
-    pathVar = "patientProfilePath",
-    verbose = TRUE
+    table = FALSE, 
+    pathVar = "patientProfilePath"
 )
 
 ```
@@ -281,7 +292,7 @@ scatterplotClinData(
 
 Time-intervals are displayed with the **`timeProfileIntervalPlot`** function:
 
-```{r timeProfileIntervalPlot}
+```{r timeProfileIntervalPlot, eval = hasPandoc}
 
 # link to patient profiles
 dataAE$patientProfilePath <- paste0(
@@ -298,8 +309,7 @@ timeProfileIntervalPlot(
     hoverVars = c("USUBJID", "AEDECOD", "ASTDY", "AENDY", "AESEV"),
     labelVars = labelVars,
     table = FALSE, pathVar = "patientProfilePath",
-    tableVars = c("USUBJID", "AEDECOD", "ASTDY", "AENDY", "AESEV"),
-    verbose = TRUE
+    tableVars = c("USUBJID", "AEDECOD", "ASTDY", "AENDY", "AESEV")
 )
 
 ```
@@ -308,7 +318,7 @@ By default, empty intervals are represented if the start/end time variables are
 missing. Missing start/end time can be imputed, or different symbols can be used
 to represent such cases:
 
-```{r timeProfileIntervalPlot-shapeVariables}
+```{r timeProfileIntervalPlot-shapeVariables, eval = hasPandoc}
 
 # create variable to indicate status of start/end date
 dataAE$AESTFLG <- ifelse(is.na(dataAE$ASTDY), "Missing start", "Complete")
@@ -363,16 +373,19 @@ the plot, a zip file containing the reports for all corresponding patients is
 downloaded**. If the attached table is display, each row can be extended to
 display the links of the respective patient profile reports.
 
-### Compute count statistics
+### Categorical variables
+
+#### Compute count statistics
 
 In this example, counts of adverse events are extracted for each
-`r labelVars["AESOC"]` and `r labelVars["AEDECOD"]`. Besides the counts of the
+`r labelVars["AESOC"]` and `r labelVars["AEDECOD"]`.   
+
+Besides the counts of the
 number of subjects, the paths to the patient profile report for each subgroup
 are extracted and combined.
 
-```{r createCountTableAE}
+```{r computeSummaryStatistics-categoricalVariable}
 
-# sunburst takes as input table with counts
 library(inTextSummaryTable)
 
 # total counts: Safety Analysis Set (patients with start date for the first treatment)
@@ -406,33 +419,37 @@ statsExtraPP <- list(
       toString(sort(unique(data$patientProfileLink)))
 )
 
-# get default counts + stats with subjects profiles path
+# get counts (records, subjects, % subjects) + stats with subjects profiles path
 statsPP <- c(
-    getStats(type = "count-default"),
+    getStats(type = "count"),
     list(
         patientProfilePath = quote(statPatientProfilePath),
         patientProfileLink = quote(statPatientProfileLink)
     )
 )
 
+dataAE$AESEV <- factor(
+	dataAE$AESEV,
+	levels = c("MILD", "MODERATE", "SEVERE")
+)
+dataAE$AESEVN <- as.numeric(dataAE$AESEV)
+
 # compute adverse event table
-tableAE <- getSummaryStatisticsTable(
+tableAE <- computeSummaryStatisticsTable(
     
     data = dataAE,
     rowVar = c("AESOC", "AEDECOD"),
     dataTotal = dataTotal,
-    rowOrder = "total",
     labelVars = labelVars,
     
     # The total across the variable used for the nodes
-	# should be specified (rowVarTotalInclude = 'AEDECOD')
-	# The total across the other variable(s) is optional
+	# should be specified
     rowVarTotalInclude = c("AESOC", "AEDECOD"),
+	
+	rowOrder = "total",
     
-    ## DT-output specific:
-    outputType = "data.frame-base",
     # statistics of interest
-    # for DT output, include columns with patients
+    # include columns with patients
     stats = statsPP, 
     # add extra 'statistic': concatenate subject IDs
     statsExtra = statsExtraPP
@@ -446,7 +463,7 @@ pander(head(tableAE),
 
 ```
 
-### Sunburst
+#### Sunburst
 
 The **`sunburstClinData`** function visualizes the counts of hierarchical data
 in nested circles.
@@ -457,26 +474,26 @@ of the circles.
 
 The size of the different segments is relative the respective counts.
 
-```{r sunburst}
+```{r sunburst, eval = hasPandoc}
 
 dataSunburst <- tableAE
 
-dataSunburst$n <- as.numeric(dataSunburst$n)
+dataSunburst$m <- as.numeric(dataSunburst$m)
 
 sunburstClinData(
     data = dataSunburst,
     vars = c("AESOC", "AEDECOD"),
-    valueVar = "n", valueLab = "Number of patients with adverse events",
+    valueVar = "m", 
+	valueLab = "Number of adverse events",
     pathVar = "patientProfileLink",
     pathLab = clinUtils::getLabelVar(var = "USUBJID", labelVars = labelVars),
     table = FALSE,
-    verbose = TRUE,
     labelVars = labelVars
 )
 
 ```
 
-### Treemap
+#### Treemap
 
 A treemap visualizes the counts of the hierarchical data in nested rectangles.
 The area of each rectangle is proportional to the counts of the respective
@@ -486,31 +503,30 @@ Note, that a treemap can also be colored accordingly to a meaningful
 variable. For instance, if we show adverse events, we might **color the plot by
 severity**. This can be achieved with the **colorVar** parameter.
 
-```{r treemap}
+```{r treemap, eval = hasPandoc}
 
 dataTreemap <- tableAE
 
-dataTreemap$n <- as.numeric(dataTreemap$n)
+dataTreemap$m <- as.numeric(dataTreemap$m)
 
 treemapClinData(
     data = dataTreemap,
     vars = c("AESOC", "AEDECOD"),
-    valueVar = "n",
-    valueLab = "Number of patients with adverse events",
+    valueVar = "m",
+    valueLab = "Number of adverse events",
     pathVar = "patientProfileLink",
     pathLab = clinUtils::getLabelVar(var = "USUBJID", labelVars = labelVars),
     table = FALSE,
-    verbose = TRUE,
     labelVars = labelVars
 )
 
 ```
 
-### Barplot
+#### Barplot
 
 A barplot visualizes the counts for one single variable in a specific order.
 
-```{r barplot}
+```{r barplot, eval = hasPandoc}
 
 dataPlot <- subset(tableAE, AEDECOD != "Total")
 
@@ -519,25 +535,133 @@ dataPlot$n <- as.numeric(dataPlot$n)
 # create plot
 barplotClinData(
     data = dataPlot,
-    xVar = "AESOC", colorVar = "AEDECOD",
+    xVar = "AEDECOD", 
     yVar = "n",
     yLab = "Number of patients with adverse events",
+	textVar = "n",
     labelVars = labelVars,
     pathVar = "patientProfileLink",
     pathLab = clinUtils::getLabelVar(var = "USUBJID", labelVars = labelVars),
-    table = FALSE,
-    verbose = TRUE,
-    barmode = "stack"
+    table = FALSE
 )
 
 ```
 
-### Boxplot
+### Continuous variable
+
+```{r getData-continuousVariable}
+
+dataVSDIABP <- subset(dataADaMCDISCP01$ADVS, 
+	PARAMCD == "DIABP" & ANL01FL == "Y" &
+	AVISIT %in% c("Baseline", "Week 2", "Week 4", "Week 6", "Week 8")
+)
+
+# add link to patient profiles report
+
+# add path in data
+dataVSDIABP$patientProfilePath <- paste0(
+	"patientProfiles/subjectProfile-", 
+	sub("/", "-", dataVSDIABP$USUBJID), ".pdf"
+)
+
+# add link in data (for attached table)
+dataVSDIABP$patientProfileLink <- with(dataVSDIABP,
+	paste0(
+		'<a href="', patientProfilePath, 
+		'" target="_blank">', USUBJID, '</a>'
+	)
+)
+
+```
+
+#### Compute summary statistics
+
+```{r computeSummaryStatistics-continuousVariable}
+
+library(inTextSummaryTable)
+
+# Specify extra summarizations besides the standard stats
+# When the data is summarized,
+# the patient profile path are summarized
+# as well across patients
+# (the paths should be collapsed with: ', ')
+statsExtraPP <- list(
+    statPatientProfilePath = function(data)	
+      toString(sort(unique(data$patientProfilePath))),
+    statPatientProfileLink = function(data)
+      toString(sort(unique(data$patientProfileLink)))
+)
+
+# get default counts + stats with subjects profiles path
+statsPP <- c(
+    getStats(x = dataVSDIABP$AVAL, type = "summary"),
+    list(
+        patientProfilePath = quote(statPatientProfilePath),
+        patientProfileLink = quote(statPatientProfileLink)
+    )
+)
+
+# compute summary table of actual value
+summaryTableCont <- computeSummaryStatisticsTable(
+    
+    data = dataVSDIABP,
+    rowVar = c("AVISIT", "ATPT"),
+	var = "AVAL",
+	
+    labelVars = labelVars,
+	
+    # statistics of interest
+    # for DT output, include columns with patients
+    stats = statsPP, 
+    # add extra 'statistic': concatenate subject IDs
+    statsExtra = statsExtraPP
+
+)
+pander(head(summaryTableCont, 1))
+```
+
+#### Plot error bars/confidence intervals
+
+```{r errorbarClinData, eval = hasPandoc}
+
+dataPlot <- subset(summaryTableCont, !isTotal)
+
+errorbarClinData(
+	data = dataPlot,
+	xVar = "AVISIT",
+	colorVar = "ATPT",
+	
+	# use non-rounded statistics for the plot
+	yVar = "statMean", 
+	yErrorVar = "statSE", 
+	
+	# display rounded stats in the hover + n: number of subjects
+	hoverVars = c("AVISIT", "ATPT", "n", "Mean", "SE"),
+	
+	yLab = "Mean", yErrorLab = "Standard Error",
+	title = "Diastolic Blood Pressure summary profile by actual visit and and analysis timepoint",
+	
+	# include lines connecting the error bars
+	mode = "markers+lines", 
+	
+	table = FALSE, labelVars = labelVars,
+	pathVar = "patientProfileLink",
+	pathLab = clinUtils::getLabelVar(var = "USUBJID", labelVars = labelVars)
+
+)
+
+```
+
+#### Boxplot
 
 A boxplot visualizes the distribution of a continuous variable of interest
 versus specific categorical variables.
 
-```{r boxplot}
+This visualization doesn't rely on pre-computed statistics, so
+the continuous variable of interest is directly passed to
+the functionality.
+
+```{r boxplot, eval = hasPandoc}
 
 dataPlot <- subset(dataADaMCDISCP01$ADVS, 
 	PARAMCD == "DIABP" & ANL01FL == "Y" &
@@ -572,7 +696,7 @@ table) in a loop (in the same _Rmarkdown_ chunk), the list of visualizations
 should be passed to the `knitPrintListObjects` function of the `clinUtils`
 package.
 
-```{r lab-profile-loop, results = "asis"}
+```{r lab-profile-loop, results = "asis", eval = hasPandoc}
 
 # consider only restricted set of lab parameters
 dataPlot <- subset(dataLB, PARAMCD %in% c("SODIUM", "K"))
@@ -593,7 +717,7 @@ plotsLab <- dlply(dataPlot, "PARAMCD", function(dataLBParam){
           data = dataLBParam, 
           xVar = "ADY",
           yVar = "LBSTRESN",
-          aesPointVar = list(color = "TRTP"),
+          aesPointVar = list(color = "TRTP", fill = "TRTP"),
           aesLineVar = list(group = "USUBJID", color = "TRTP"),
           labelVars = labelVars,
           title = paste("Actual value of", 
@@ -606,8 +730,7 @@ plotsLab <- dlply(dataPlot, "PARAMCD", function(dataLBParam){
           table = FALSE, 
           # important: each plot should have an unique ID!
           # for unique relationship of interactivity between plot <-> table
-          id = paste("labProfileLoop", paramcd, sep = "-"),
-          verbose = TRUE
+          id = paste("labProfileLoop", paramcd, sep = "-")
       )
       
     })
@@ -644,7 +767,7 @@ str(shapesDefault)
 
 ```
 
-```{r palettes-default-example}
+```{r palettes-default-example, eval = hasPandoc}
 
 timeProfileIntervalPlot(
     data = dataAE,
@@ -674,7 +797,7 @@ options(clinDataReview.shapes = clinShapes)
 In case the palette contains less elements than available in the data, these are
 replicated.
 
-```{r palettes-customGeneral-example}
+```{r palettes-customGeneral-example, eval = hasPandoc}
 
 timeProfileIntervalPlot(
     data = dataAE,

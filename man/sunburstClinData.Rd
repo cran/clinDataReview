@@ -13,7 +13,6 @@ sunburstClinData(...)
     \item{\code{colorVar}}{(optional) String with coloring variable
 (NULL by default).
 By default, the treemap is colored based by section.}
-    \item{\code{colorLab}}{(optional) String with label for \code{colorVar}.}
     \item{\code{colorRange}}{(optional) Numeric vector of length 2 with range 
 for the color variable, in case it is a numeric variable.}
     \item{\code{vars}}{Character vector with variables of \code{data}
@@ -46,11 +45,19 @@ included in the collapsible row in the table.}
 returns also a \code{datatable} containing the plot data.
 (The plot and the table are not linked.)}
     \item{\code{data}}{Data.frame with data.}
+    \item{\code{colorLab}}{String with label for \code{colorVar}.}
     \item{\code{colorPalette}}{(optional) Named character vector with color palette.
 If not specified, the viridis color palette is used.\cr
 See \code{\link[clinUtils]{clinColors}}.}
     \item{\code{titleExtra}}{String with extra title for the plot (appended after \code{title}).}
     \item{\code{title}}{String with title for the plot.}
+    \item{\code{subtitle}}{String with subtitle.\cr
+The subtitle is included at the top left of the plot,
+below the title.}
+    \item{\code{caption}}{String with caption. \cr
+The caption is included at the bottom right of the plot.
+Please note that this might overlap with 
+vertical or rotated x-axis labels.}
     \item{\code{labelVars}}{Named character vector containing variable labels.}
     \item{\code{width}}{Numeric, width of the plot in pixels,
 700 by default.}
@@ -82,11 +89,11 @@ the table is included within an HTML button.}
 \value{
 Either:
 \itemize{
-\item{if \code{table} is requested}{
+\item{if a \code{table} is requested: }{
 a \code{clinDataReview} object, a.k.a a list with the 
 'plot' (\code{\link[plotly]{plotly}} object) and 'table'
 (\code{\link[DT]{datatable}} object)}
-\item{otherwise: }{\code{\link[plotly]{plotly}} object}
+\item{otherwise: }{a \code{\link[plotly]{plotly}} object}
 }
 }
 \description{
@@ -156,13 +163,16 @@ sunburstClinData(
 	data = tableDM,
 	vars = c("ARM", "SITEID"),
 	valueVar = "statN", valueLab = "Counts of patients",
-	valueType = "total"
+	valueType = "total",
+	caption = "The sectors are colored by category.",
+	subtitle = "Group: treatment and site"
 )
 }
 \seealso{
 Other visualizations of summary statistics for clinical data: 
 \code{\link{barplotClinData}()},
 \code{\link{boxplotClinData}()},
+\code{\link{errorbarClinData}()},
 \code{\link{plotCountClinData}()},
 \code{\link{treemapClinData}()}
 }

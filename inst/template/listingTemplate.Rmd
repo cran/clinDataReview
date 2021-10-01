@@ -98,9 +98,10 @@ if(comparisonTableType != "none") {
 
 dataList <- sapply(names(pathsData), function(dataBatch) {
 			
+	pathDataBatch <- pathsData[[dataBatch]]
+			
 	# Load data
-	pathData <- file.path(pathsData[[dataBatch]], dataFileName)
-	
+	pathData <- file.path(pathDataBatch, dataFileName)
 	dataAll <- clinUtils::loadDataADaMSDTM(pathData, verbose = FALSE)
 	data <- dataAll[[1]]
 	
@@ -111,7 +112,7 @@ dataList <- sapply(names(pathsData), function(dataBatch) {
 	if(exists("dataProcessing")){
 		data <- processData(
 			data = data, 
-			dataPath = pathDataFolder,
+			dataPath = pathDataBatch,
 			processing = dataProcessing,
 			verbose = TRUE,
 			labelVars = labelVars
@@ -129,13 +130,18 @@ dataList <- sapply(names(pathsData), function(dataBatch) {
 		)
 	
 	# only subset of the data if requested
-	if(!is.null(loopingVar) && exists("loopingNMax") &&	is.integer(loopingNMax)){
+	if(!is.null(loopingVar)){
 		
-		data <- merge(
-			x = data,
-			y = unique(data[, loopingVar, drop = FALSE])[seq_len(loopingNMax), , drop = FALSE],
-			all = FALSE
-		)
+		# format label for 'knitPrintClinDataReview'
+		data[, loopingVar] <- colwise(function(x) gsub("\\.", "", x))(data[, loopingVar, drop = FALSE])
+		
+		if(exists("loopingNMax") &&	is.integer(loopingNMax)){
+			data <- merge(
+				x = data,
+				y = unique(data[, loopingVar, drop = FALSE])[seq_len(loopingNMax), , drop = FALSE],
+				all = FALSE
+			)
+		}
 		
 	}
 	

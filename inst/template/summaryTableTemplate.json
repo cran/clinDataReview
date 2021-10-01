@@ -45,7 +45,7 @@
     
     "tableParams": {
       "type": "object",
-      "doc": "parameters to summarize the data in a table, passed to \\link[inTextSummaryTable]{computeSummaryStatisticsTable}"
+      "doc": "parameters to summarize the data in a table, passed to \\link[inTextSummaryTable]{computeSummaryStatisticsTable}\n.Parameters depending on the dataset of interest can be specified as:\\cr\\code{[parameterName]: !r-lazy [dataI]}."
     },
     "tableParamsDocx": {
       "type": "object",
@@ -59,8 +59,8 @@
     "comparisonTableType": {
       "type": "string",
       "doc": "output type of the comparison table",
-      "enum": ["none", "table-comparison-interactive", "newData-diff"],
-      "doc": "for 'table-comparison-interactive': the summary statistics are computed, and then compared, 'newData-diff': the differences at a record level between the new and old batch are first identified, and then summarized"
+      "enum": ["none", "table-comparison-interactive", "newData-diff", "table-combine"],
+      "doc": "\\itemize{\\item{'table-comparison-interactive': }{the summary statistics are computed for the old and new batch separately, and the statistics are compared}\\item{'newData-diff': }{the differences at a record level between the new and old batch are first identified, and then summarized}\\item{'table-combine': }{the summary tables are computed for the old and new batch and displayed next to each other in a combined table}}"
     },
     "comparisonTableParams": {
       "type": "object",
@@ -68,7 +68,7 @@
     },
     "loopingVar": {
       "type": ["array", "string"],
-      "doc": "data variable(s) to loop over, for which each output should be created"
+      "doc": "data variable(s) to loop over. Each group of the variable(s) is displayed in a separated section of the report."
     },
     "loopingNMax": {
       "type": "integer",
