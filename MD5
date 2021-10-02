@@ -1,4 +1,4 @@
-4415d6a43a7dcc7f08810856918889e0 *DESCRIPTION
+d9f1ed84cacbaa650770f22d9e218b8f *DESCRIPTION
 01974937b40279205581a84931ae0cdf *LICENSE
 fb0bcf1865f9bba3abc0230009fd26f2 *NAMESPACE
 336f321cd04a8579fcb8d6c5376557b8 *R/dataManipulation-annotateData.R
@@ -37,7 +37,7 @@ f32677f32c3342ad4de6c7d939574245 *R/reporting-render_clinDataReviewReport.R
 6e720ee04d087774b83e4d8c9022079e *R/reporting-utility.R
 3165946a513908a1c06c0676ddc779ad *R/reporting-zipClinDataReviewReport.R
 4a24eb73790639b12d0ed82f382ae5f1 *build/vignette.rds
-8fabd0ca3b92ff970d68e4b3f25950ae *inst/NEWS
+07d821e0075d9ed8e347428c942c060c *inst/NEWS
 f8f98392aa4ca803b9803b374aa353a9 *inst/css/gitbook.css
 654a10608c4a114eb43c1de81dd1185c *inst/doc/clinDataReview-dataPreprocessing.Rmd
 5269bcc8eccd10f2f7e2d9e1eadc86f7 *inst/doc/clinDataReview-dataPreprocessing.html
@@ -205,7 +205,7 @@ ddaee3309a291566bc0f8ecd58d7d719 *tests/files/interim/index.md
 cfc97e32ea2c2d04d1564db634ae5346 *tests/testthat/test_annotateData.R
 b42151adccefa5119755112d85c8f8aa *tests/testthat/test_barplotClinData.R
 967ad301c04d0fe9e40a0d8e77fd7fab *tests/testthat/test_boxplotClinData.R
-cff58c10f58b013df11945a94a7123bf *tests/testthat/test_errorbarClinData.R
+000cf2e841420bfaea54ebcd37b4a405 *tests/testthat/test_errorbarClinData.R
 4cfad8bd15a798e6d3333e2168bc98d3 *tests/testthat/test_filterData.R
 52dd674e36eb07eb339424e7c9d28b0c *tests/testthat/test_getPathHyperlink.R
 b97a0bff52a4b7a342459745b6e1bed0 *tests/testthat/test_getPlotTableVars.R
