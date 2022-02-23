@@ -12,23 +12,10 @@
 
 <meta name="author" content="Laure Cougnaud, Michela Pasetto" />
 
-<meta name="date" content="2021-10-01" />
+<meta name="date" content="2022-02-23" />
 
 <title>Creation of a clinical data review report</title>
 
-<script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
-// be compatible with the behavior of Pandoc < 2.8).
-document.addEventListener('DOMContentLoaded', function(e) {
-  var hs = document.querySelectorAll("div.section[class*='level'] > :first-child");
-  var i, h, a;
-  for (i = 0; i < hs.length; i++) {
-    h = hs[i];
-    if (!/^h[1-6]$/i.test(h.tagName)) continue;  // it should be a header h1-h6
-    a = h.attributes;
-    while (a.length > 0) h.removeAttribute(a[0].name);
-  }
-});
-</script>
 
 <style type="text/css">
   code{white-space: pre-wrap;}
@@ -49,27 +36,26 @@ document.addEventListener('DOMContentLoaded', function(e) {
   }
 </style>
 <style type="text/css" data-origin="pandoc">
-pre > code.sourceCode { white-space: pre; position: relative; }
-pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
-pre > code.sourceCode > span:empty { height: 1.2em; }
-code.sourceCode > span { color: inherit; text-decoration: inherit; }
+a.sourceLine { display: inline-block; line-height: 1.25; }
+a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
+a.sourceLine:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode { white-space: pre; position: relative; }
 div.sourceCode { margin: 1em 0; }
 pre.sourceCode { margin: 0; }
 @media screen {
 div.sourceCode { overflow: auto; }
 }
 @media print {
-pre > code.sourceCode { white-space: pre-wrap; }
-pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+code.sourceCode { white-space: pre-wrap; }
+a.sourceLine { text-indent: -1em; padding-left: 1em; }
 }
-pre.numberSource code
-  { counter-reset: source-line 0; }
-pre.numberSource code > span
-  { position: relative; left: -4em; counter-increment: source-line; }
-pre.numberSource code > span > a:first-child::before
-  { content: counter(source-line);
+pre.numberSource a.sourceLine
+  { position: relative; left: -4em; }
+pre.numberSource a.sourceLine::before
+  { content: attr(title);
     position: relative; left: -1em; text-align: right; vertical-align: baseline;
-    border: none; display: inline-block;
+    border: none; pointer-events: all; display: inline-block;
     -webkit-touch-callout: none; -webkit-user-select: none;
     -khtml-user-select: none; -moz-user-select: none;
     -ms-user-select: none; user-select: none;
@@ -78,9 +64,9 @@ pre.numberSource code > span > a:first-child::before
   }
 pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
 div.sourceCode
-  {   }
+  {  }
 @media screen {
-pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+a.sourceLine::before { text-decoration: underline; }
 }
 code span.al { color: #ff0000; font-weight: bold; } /* Alert */
 code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
@@ -332,60 +318,54 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 
 <h1 class="title toc-ignore">Creation of a clinical data review report</h1>
 <h4 class="author">Laure Cougnaud, Michela Pasetto</h4>
-<h4 class="date">October 01, 2021</h4>
+<h4 class="date">February 23, 2022</h4>
 
 
 <div id="TOC">
 <ul>
 <li><a href="#create-an-example-report"><span class="toc-section-number">1</span> Create an example report</a></li>
-<li><a href="#file-structure"><span class="toc-section-number">2</span> File structure</a>
-<ul>
+<li><a href="#file-structure"><span class="toc-section-number">2</span> File structure</a><ul>
 <li><a href="#input"><span class="toc-section-number">2.1</span> Input</a></li>
 <li><a href="#output"><span class="toc-section-number">2.2</span> Output</a></li>
 </ul></li>
 <li><a href="#template-reports"><span class="toc-section-number">3</span> Template reports</a></li>
-<li><a href="#render-a-clinical-data-review-report"><span class="toc-section-number">4</span> Render a clinical data review report</a>
-<ul>
-<li><a href="#production"><span class="toc-section-number">4.1</span> Production</a>
-<ul>
+<li><a href="#render-a-clinical-data-review-report"><span class="toc-section-number">4</span> Render a clinical data review report</a><ul>
+<li><a href="#production"><span class="toc-section-number">4.1</span> Production</a><ul>
 <li><a href="#create-a-report-for-production"><span class="toc-section-number">4.1.1</span> Create a report for production</a></li>
 <li><a href="#create-redirect-page"><span class="toc-section-number">4.1.2</span> Create redirect page</a></li>
 <li><a href="#zip-and-send-the-report-to-collaborators"><span class="toc-section-number">4.1.3</span> Zip and send the report to collaborators</a></li>
 <li><a href="#add-metadata"><span class="toc-section-number">4.1.4</span> Add metadata</a></li>
 </ul></li>
-<li><a href="#development"><span class="toc-section-number">4.2</span> Development</a>
-<ul>
-<li><a href="#modular-framework"><span class="toc-section-number">4.2.1</span> Modular framework</a>
-<ul>
+<li><a href="#development"><span class="toc-section-number">4.2</span> Development</a><ul>
+<li><a href="#modular-framework"><span class="toc-section-number">4.2.1</span> Modular framework</a><ul>
 <li><a href="#re-run-parts-of-the-report"><span class="toc-section-number">4.2.1.1</span> (Re-)run part(s) of the report</a></li>
 <li><a href="#create-the-final-clinical-data-report-from-the-markdown-reports"><span class="toc-section-number">4.2.1.2</span> Create the final clinical data report from the Markdown reports</a></li>
 </ul></li>
 <li><a href="#debug-a-sub-report"><span class="toc-section-number">4.2.2</span> Debug a sub-report</a></li>
 </ul></li>
 </ul></li>
-<li><a href="#appendix"><span class="toc-section-number">5</span> Appendix</a>
-<ul>
+<li><a href="#appendix"><span class="toc-section-number">5</span> Appendix</a><ul>
 <li><a href="#session-info"><span class="toc-section-number">5.1</span> Session info</a></li>
 </ul></li>
 </ul>
 </div>
 
 <p>Utility functions are provided to create a standard clinical data review report. Please note that the examples in this section are only informative, and not evaluated in the vignette itself.</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true"></a><span class="kw">library</span>(clinDataReview)</span></code></pre></div>
-<div id="create-an-example-report" class="section level1" number="1">
-<h1 number="1"><span class="header-section-number">1</span> Create an example report</h1>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" title="1"><span class="kw">library</span>(clinDataReview)</a></code></pre></div>
+<div id="create-an-example-report" class="section level1">
+<h1><span class="header-section-number">1</span> Create an example report</h1>
 <p>To create your clinical data review report, we advise to start from a skeleton of such report, via:</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true"></a><span class="kw">createClinDataReviewReportSkeleton</span>()</span></code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" title="1"><span class="kw">createClinDataReviewReportSkeleton</span>()</a></code></pre></div>
 <p>This report is based on an example dataset (subset of the CDISC Pilot 01 dataset), available in the <code>clinUtils</code> package.</p>
 <p>The report is created via:</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true"></a><span class="kw">render_clinDataReviewReport</span>()</span></code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" title="1"><span class="kw">render_clinDataReviewReport</span>()</a></code></pre></div>
 <p>You can further tailor the report to your dataset(s) of interest and sections of interest.</p>
 <p>See the next sections for further informations.</p>
 </div>
-<div id="file-structure" class="section level1" number="2">
-<h1 number="2"><span class="header-section-number">2</span> File structure</h1>
-<div id="input" class="section level2" number="2.1">
-<h2 number="2.1"><span class="header-section-number">2.1</span> Input</h2>
+<div id="file-structure" class="section level1">
+<h1><span class="header-section-number">2</span> File structure</h1>
+<div id="input" class="section level2">
+<h2><span class="header-section-number">2.1</span> Input</h2>
 <p>The input for the clinical data report consists of a set of <em>Rmardown</em> files and a <code>config</code> directory.</p>
 <p><strong>Rmd files</strong></p>
 <p>A set of <em>Rmarkdown</em> files in the working directory should be</p>
@@ -404,7 +384,7 @@ This file should be formatted as a <em>Rmarkdown</em> report with <em>YAML</em> 
 <li><code>study</code> (optional): study name</li>
 <li><code>version</code> (optional): data version, e.g. batch</li>
 </ul></li>
-<li><p>a configuration file for each chapter, as: <em>config-[chapterName].yml</em>. This file should contain input parameters containing:</p>
+<li>a configuration file for each chapter, as: <em>config-[chapterName].yml</em>. This file should contain input parameters containing:
 <ul>
 <li><code>template</code>: filename of the <em>Rmd</em> file to consider for this chapter</li>
 <li><code>templatePackage</code>: name of the R package where the <em>Rmd</em> should be extracted from</li>
@@ -420,8 +400,8 @@ For the template reports available in the <code>clinDataReview</code> package, t
 </ul>
 <p>Please see the <code>? clinDataReview-templates</code> documentation for further information on the template reports available in the <code>clinDataReview</code> package, and their input parameters.</p>
 </div>
-<div id="output" class="section level2" number="2.2">
-<h2 number="2.2"><span class="header-section-number">2.2</span> Output</h2>
+<div id="output" class="section level2">
+<h2><span class="header-section-number">2.2</span> Output</h2>
 <p>The clinical data report consists of a final report output and a set of intermediary results.</p>
 <p><strong>Final output</strong></p>
 <p>A final output folder (‘report’ by default) containing the:</p>
@@ -440,33 +420,33 @@ For the template reports available in the <code>clinDataReview</code> package, t
 </ul>
 </div>
 </div>
-<div id="template-reports" class="section level1" number="3">
-<h1 number="3"><span class="header-section-number">3</span> Template reports</h1>
+<div id="template-reports" class="section level1">
+<h1><span class="header-section-number">3</span> Template reports</h1>
 <p>A set of template reports are available in the <code>clinDataReview</code> package itself.</p>
 <p><strong>The full list of the reports and the corresponding input parameters is available at: <code>?</code>clinDataReview-templates<code></code></strong>.</p>
 <p>To use a template available in the package for one of your report, your config file should contain the corresponding name of the template via the <code>template</code> tag and the <code>templatePackage</code> set to ‘clinDataReview’.</p>
 <p>For example, to include a division in the report, your YAML config file should be formatted as:</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true"></a>template<span class="op">:</span> divisionTemplate<span class="op">.</span><span class="at">Rmd</span></span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true"></a>templatePackage<span class="op">:</span> clinDataReview</span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true"></a>reportTitle<span class="op">:</span> <span class="st">&quot;Title for a chapter&quot;</span></span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true"></a>reportTitleLevel<span class="op">:</span> <span class="dv">1</span></span></code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode js"><code class="sourceCode javascript"><a class="sourceLine" id="cb4-1" title="1">template<span class="op">:</span> <span class="va">divisionTemplate</span>.<span class="at">Rmd</span></a>
+<a class="sourceLine" id="cb4-2" title="2">templatePackage<span class="op">:</span> clinDataReview</a>
+<a class="sourceLine" id="cb4-3" title="3">reportTitle<span class="op">:</span> <span class="st">&quot;Title for a chapter&quot;</span></a>
+<a class="sourceLine" id="cb4-4" title="4">reportTitleLevel<span class="op">:</span> <span class="dv">1</span></a></code></pre></div>
 </div>
-<div id="render-a-clinical-data-review-report" class="section level1" number="4">
-<h1 number="4"><span class="header-section-number">4</span> Render a clinical data review report</h1>
-<div id="production" class="section level2" number="4.1">
-<h2 number="4.1"><span class="header-section-number">4.1</span> Production</h2>
-<div id="create-a-report-for-production" class="section level3" number="4.1.1">
-<h3 number="4.1.1"><span class="header-section-number">4.1.1</span> Create a report for production</h3>
+<div id="render-a-clinical-data-review-report" class="section level1">
+<h1><span class="header-section-number">4</span> Render a clinical data review report</h1>
+<div id="production" class="section level2">
+<h2><span class="header-section-number">4.1</span> Production</h2>
+<div id="create-a-report-for-production" class="section level3">
+<h3><span class="header-section-number">4.1.1</span> Create a report for production</h3>
 <p>The function <strong><code>render_clinDataReviewReport</code> renders a clinical data report for production</strong>.</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true"></a>clinDataReview<span class="op">::</span><span class="kw">render_clinDataReviewReport</span>()</span></code></pre></div>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" title="1">clinDataReview<span class="op">::</span><span class="kw">render_clinDataReviewReport</span>()</a></code></pre></div>
 <p>The <code>render_clinDataReviewReport</code> creates several html files, one per section/subsection.</p>
 <p>To open the full report, the user should open the <em>introduction.html</em> file.</p>
 <p>In case a lot of different html chapters are created, a landing page can be created to guide the end-user to the opening of the report.</p>
 </div>
-<div id="create-redirect-page" class="section level3" number="4.1.2">
-<h3 number="4.1.2"><span class="header-section-number">4.1.2</span> Create redirect page</h3>
+<div id="create-redirect-page" class="section level3">
+<h3><span class="header-section-number">4.1.2</span> Create redirect page</h3>
 <p>A convenient way to store all html files into one location, and have only one page to look for to open the report is the function</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true"></a>clinDataReview<span class="op">::</span><span class="kw">createRedirectPage</span>()</span></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb6-1" title="1">clinDataReview<span class="op">::</span><span class="kw">createRedirectPage</span>()</a></code></pre></div>
 <p>This function:</p>
 <ul>
 <li>stores all html files into a folder</li>
@@ -474,74 +454,74 @@ For the template reports available in the <code>clinDataReview</code> package, t
 </ul>
 <p>The default names of the folder and landing page are <em>report_dependencies</em> and <em>report.html</em>. The names can be changed by the user.</p>
 </div>
-<div id="zip-and-send-the-report-to-collaborators" class="section level3" number="4.1.3">
-<h3 number="4.1.3"><span class="header-section-number">4.1.3</span> Zip and send the report to collaborators</h3>
+<div id="zip-and-send-the-report-to-collaborators" class="section level3">
+<h3><span class="header-section-number">4.1.3</span> Zip and send the report to collaborators</h3>
 <p>A dedicated functionality is available to zip the report and send it to colleagues within the team.</p>
 <p>Once a report has been rendered, the user can call:</p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true"></a>clinDataReview<span class="op">::</span><span class="kw">zipClinDataReview</span>()</span></code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb7-1" title="1">clinDataReview<span class="op">::</span><span class="kw">zipClinDataReview</span>()</a></code></pre></div>
 <p>This function zips the report, so that the analyses can be easily put as attachement in a mail/uploaded to a shared drive.</p>
 <p>If the folder is not unzipped before opening the reports, a message in the browser reminds to unzip the documents.</p>
 </div>
-<div id="add-metadata" class="section level3" number="4.1.4">
-<h3 number="4.1.4"><span class="header-section-number">4.1.4</span> Add metadata</h3>
+<div id="add-metadata" class="section level3">
+<h3><span class="header-section-number">4.1.4</span> Add metadata</h3>
 <p>Metadata can be added in the landing page, containing information concerning the data set creation time, the path to the original data etc.</p>
 <p>A metadata file should be in yaml format.</p>
 <p>The metadata function can be directly called in a Rmd documents with</p>
-<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true"></a>clinDataReview<span class="op">::</span><span class="kw">getMetadata</span>()</span></code></pre></div>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb8-1" title="1">clinDataReview<span class="op">::</span><span class="kw">getMetadata</span>()</a></code></pre></div>
 </div>
 </div>
-<div id="development" class="section level2" number="4.2">
-<h2 number="4.2"><span class="header-section-number">4.2</span> Development</h2>
+<div id="development" class="section level2">
+<h2><span class="header-section-number">4.2</span> Development</h2>
 <p>To facilitate the creation of the report, a few utility functions &amp; dedicated parameters are available.</p>
-<div id="modular-framework" class="section level3" number="4.2.1">
-<h3 number="4.2.1"><span class="header-section-number">4.2.1</span> Modular framework</h3>
-<div id="re-run-parts-of-the-report" class="section level4" number="4.2.1.1">
-<h4 number="4.2.1.1"><span class="header-section-number">4.2.1.1</span> (Re-)run part(s) of the report</h4>
+<div id="modular-framework" class="section level3">
+<h3><span class="header-section-number">4.2.1</span> Modular framework</h3>
+<div id="re-run-parts-of-the-report" class="section level4">
+<h4><span class="header-section-number">4.2.1.1</span> (Re-)run part(s) of the report</h4>
 <p>In case the creation of the entire report is time-consuming, and only part(s) of the report have been updated, it might be interesting to only re-run some parts of the report. Config files associated to the parts of the report that should be rerun can be specified via the <code>configFiles</code> parameter.</p>
-<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true"></a><span class="co"># run one specific report</span></span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true"></a>clinDataReview<span class="op">::</span><span class="kw">render_clinDataReviewReport</span>(<span class="dt">configFiles =</span> <span class="st">&quot;config-AE_timeprofile.yml&quot;</span>)</span>
-<span id="cb9-3"><a href="#cb9-3" aria-hidden="true"></a><span class="co"># only run the listings:</span></span>
-<span id="cb9-4"><a href="#cb9-4" aria-hidden="true"></a>clinDataReview<span class="op">::</span><span class="kw">render_clinDataReviewReport</span>(<span class="dt">configFiles =</span> <span class="kw">list.files</span>(<span class="dt">pattern =</span> <span class="st">&quot;listing&quot;</span>, <span class="st">&quot;config&quot;</span>))</span></code></pre></div>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb9-1" title="1"><span class="co"># run one specific report</span></a>
+<a class="sourceLine" id="cb9-2" title="2">clinDataReview<span class="op">::</span><span class="kw">render_clinDataReviewReport</span>(<span class="dt">configFiles =</span> <span class="st">&quot;config-AE_timeprofile.yml&quot;</span>)</a>
+<a class="sourceLine" id="cb9-3" title="3"><span class="co"># only run the listings:</span></a>
+<a class="sourceLine" id="cb9-4" title="4">clinDataReview<span class="op">::</span><span class="kw">render_clinDataReviewReport</span>(<span class="dt">configFiles =</span> <span class="kw">list.files</span>(<span class="dt">pattern =</span> <span class="st">&quot;listing&quot;</span>, <span class="st">&quot;config&quot;</span>))</a></code></pre></div>
 </div>
-<div id="create-the-final-clinical-data-report-from-the-markdown-reports" class="section level4" number="4.2.1.2">
-<h4 number="4.2.1.2"><span class="header-section-number">4.2.1.2</span> Create the final clinical data report from the Markdown reports</h4>
+<div id="create-the-final-clinical-data-report-from-the-markdown-reports" class="section level4">
+<h4><span class="header-section-number">4.2.1.2</span> Create the final clinical data report from the Markdown reports</h4>
 <p>To convert all created <em>Markdown</em> files to HTML, the dedicated function <code>convertMdToHtml</code> can be used.</p>
-<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true"></a><span class="kw">convertMdToHtml</span>()</span></code></pre></div>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb10-1" title="1"><span class="kw">convertMdToHtml</span>()</a></code></pre></div>
 </div>
 </div>
-<div id="debug-a-sub-report" class="section level3" number="4.2.2">
-<h3 number="4.2.2"><span class="header-section-number">4.2.2</span> Debug a sub-report</h3>
+<div id="debug-a-sub-report" class="section level3">
+<h3><span class="header-section-number">4.2.2</span> Debug a sub-report</h3>
 <p>To debug a sub-report, it might be interesting to run only one specific R report in the current R session, with the parameters provided by the associated config file. This can be achieved as followed:</p>
-<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true"></a><span class="co"># get parameters from the general &#39;config.yml&#39; and the specified config file</span></span>
-<span id="cb11-2"><a href="#cb11-2" aria-hidden="true"></a>params &lt;-<span class="st"> </span><span class="kw">getParamsFromConfig</span>(<span class="dt">configFile =</span> <span class="st">&quot;config-AE_timeprofile.yml&quot;</span>)</span>
-<span id="cb11-3"><a href="#cb11-3" aria-hidden="true"></a></span>
-<span id="cb11-4"><a href="#cb11-4" aria-hidden="true"></a><span class="co"># extract template from package if specified</span></span>
-<span id="cb11-5"><a href="#cb11-5" aria-hidden="true"></a><span class="cf">if</span>(params<span class="op">$</span>templatePackage <span class="op">==</span><span class="st"> &quot;clinDataReview&quot;</span>){</span>
-<span id="cb11-6"><a href="#cb11-6" aria-hidden="true"></a>  pathTemplate &lt;-<span class="st"> </span>clinDataReview<span class="op">::</span><span class="kw">getPathTemplate</span>(<span class="dt">file =</span> params<span class="op">$</span>template)</span>
-<span id="cb11-7"><a href="#cb11-7" aria-hidden="true"></a>  <span class="kw">file.copy</span>(<span class="dt">from =</span> pathTemplate, <span class="dt">to =</span> <span class="st">&quot;.&quot;</span>)</span>
-<span id="cb11-8"><a href="#cb11-8" aria-hidden="true"></a>}</span>
-<span id="cb11-9"><a href="#cb11-9" aria-hidden="true"></a></span>
-<span id="cb11-10"><a href="#cb11-10" aria-hidden="true"></a><span class="co"># run a current chapter (without clinical data Js libraries)</span></span>
-<span id="cb11-11"><a href="#cb11-11" aria-hidden="true"></a><span class="co"># Note that Js library to have the functionality to download patient profiles is not imported</span></span>
-<span id="cb11-12"><a href="#cb11-12" aria-hidden="true"></a>rmarkdown<span class="op">::</span><span class="kw">render</span>(<span class="dt">input =</span> params<span class="op">$</span>template)</span>
-<span id="cb11-13"><a href="#cb11-13" aria-hidden="true"></a></span>
-<span id="cb11-14"><a href="#cb11-14" aria-hidden="true"></a><span class="co"># preview a specific chapter (with clinical data Js libraries)</span></span>
-<span id="cb11-15"><a href="#cb11-15" aria-hidden="true"></a>bookdown<span class="op">::</span><span class="kw">render_book</span>(<span class="dt">input =</span> params<span class="op">$</span>template, <span class="dt">preview =</span> <span class="ot">TRUE</span>)</span>
-<span id="cb11-16"><a href="#cb11-16" aria-hidden="true"></a><span class="co"># include the index file:</span></span>
-<span id="cb11-17"><a href="#cb11-17" aria-hidden="true"></a>bookdown<span class="op">::</span><span class="kw">render_book</span>(<span class="dt">input =</span> <span class="kw">c</span>(<span class="st">&quot;index.Rmd&quot;</span>, params<span class="op">$</span>template), <span class="dt">preview =</span> <span class="ot">TRUE</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb11-1" title="1"><span class="co"># get parameters from the general &#39;config.yml&#39; and the specified config file</span></a>
+<a class="sourceLine" id="cb11-2" title="2">params &lt;-<span class="st"> </span><span class="kw">getParamsFromConfig</span>(<span class="dt">configFile =</span> <span class="st">&quot;config-AE_timeprofile.yml&quot;</span>)</a>
+<a class="sourceLine" id="cb11-3" title="3"></a>
+<a class="sourceLine" id="cb11-4" title="4"><span class="co"># extract template from package if specified</span></a>
+<a class="sourceLine" id="cb11-5" title="5"><span class="cf">if</span>(params<span class="op">$</span>templatePackage <span class="op">==</span><span class="st"> &quot;clinDataReview&quot;</span>){</a>
+<a class="sourceLine" id="cb11-6" title="6">  pathTemplate &lt;-<span class="st"> </span>clinDataReview<span class="op">::</span><span class="kw">getPathTemplate</span>(<span class="dt">file =</span> params<span class="op">$</span>template)</a>
+<a class="sourceLine" id="cb11-7" title="7">  <span class="kw">file.copy</span>(<span class="dt">from =</span> pathTemplate, <span class="dt">to =</span> <span class="st">&quot;.&quot;</span>)</a>
+<a class="sourceLine" id="cb11-8" title="8">}</a>
+<a class="sourceLine" id="cb11-9" title="9"></a>
+<a class="sourceLine" id="cb11-10" title="10"><span class="co"># run a current chapter (without clinical data Js libraries)</span></a>
+<a class="sourceLine" id="cb11-11" title="11"><span class="co"># Note that Js library to have the functionality to download patient profiles is not imported</span></a>
+<a class="sourceLine" id="cb11-12" title="12">rmarkdown<span class="op">::</span><span class="kw">render</span>(<span class="dt">input =</span> params<span class="op">$</span>template)</a>
+<a class="sourceLine" id="cb11-13" title="13"></a>
+<a class="sourceLine" id="cb11-14" title="14"><span class="co"># preview a specific chapter (with clinical data Js libraries)</span></a>
+<a class="sourceLine" id="cb11-15" title="15">bookdown<span class="op">::</span><span class="kw">render_book</span>(<span class="dt">input =</span> params<span class="op">$</span>template, <span class="dt">preview =</span> <span class="ot">TRUE</span>)</a>
+<a class="sourceLine" id="cb11-16" title="16"><span class="co"># include the index file:</span></a>
+<a class="sourceLine" id="cb11-17" title="17">bookdown<span class="op">::</span><span class="kw">render_book</span>(<span class="dt">input =</span> <span class="kw">c</span>(<span class="st">&quot;index.Rmd&quot;</span>, params<span class="op">$</span>template), <span class="dt">preview =</span> <span class="ot">TRUE</span>)</a></code></pre></div>
 </div>
 </div>
 </div>
-<div id="appendix" class="section level1" number="5">
-<h1 number="5"><span class="header-section-number">5</span> Appendix</h1>
-<div id="session-info" class="section level2" number="5.1">
-<h2 number="5.1"><span class="header-section-number">5.1</span> Session info</h2>
-<p><strong>R version 4.1.1 (2021-08-10)</strong></p>
+<div id="appendix" class="section level1">
+<h1><span class="header-section-number">5</span> Appendix</h1>
+<div id="session-info" class="section level2">
+<h2><span class="header-section-number">5.1</span> Session info</h2>
+<p><strong>R version 4.1.2 (2021-11-01)</strong></p>
 <p><strong>Platform:</strong> x86_64-pc-linux-gnu (64-bit)</p>
-<p><strong>locale:</strong> <em>LC_CTYPE=en_US.UTF-8</em>, <em>LC_NUMERIC=C</em>, <em>LC_TIME=en_GB.UTF-8</em>, <em>LC_COLLATE=en_US.UTF-8</em>, <em>LC_MONETARY=en_GB.UTF-8</em>, <em>LC_MESSAGES=en_US.UTF-8</em>, <em>LC_PAPER=en_GB.UTF-8</em>, <em>LC_NAME=C</em>, <em>LC_ADDRESS=C</em>, <em>LC_TELEPHONE=C</em>, <em>LC_MEASUREMENT=en_GB.UTF-8</em> and <em>LC_IDENTIFICATION=C</em></p>
+<p><strong>locale:</strong> <em>LC_CTYPE=en_US.UTF-8</em>, <em>LC_NUMERIC=C</em>, <em>LC_TIME=en_US.UTF-8</em>, <em>LC_COLLATE=C</em>, <em>LC_MONETARY=en_US.UTF-8</em>, <em>LC_MESSAGES=en_US.UTF-8</em>, <em>LC_PAPER=en_US.UTF-8</em>, <em>LC_NAME=C</em>, <em>LC_ADDRESS=C</em>, <em>LC_TELEPHONE=C</em>, <em>LC_MEASUREMENT=en_US.UTF-8</em> and <em>LC_IDENTIFICATION=C</em></p>
 <p><strong>attached base packages:</strong> <em>stats</em>, <em>graphics</em>, <em>grDevices</em>, <em>utils</em>, <em>datasets</em>, <em>methods</em> and <em>base</em></p>
-<p><strong>other attached packages:</strong> <em>clinDataReview(v.1.2.0)</em>, <em>pander(v.0.6.4)</em> and <em>knitr(v.1.36)</em></p>
-<p><strong>loaded via a namespace (and not attached):</strong> <em>tidyselect(v.1.1.1)</em>, <em>xfun(v.0.26)</em>, <em>bslib(v.0.3.0)</em>, <em>purrr(v.0.3.4)</em>, <em>haven(v.2.4.3)</em>, <em>V8(v.3.4.2)</em>, <em>colorspace(v.2.0-2)</em>, <em>vctrs(v.0.3.8)</em>, <em>generics(v.0.1.0)</em>, <em>htmltools(v.0.5.2)</em>, <em>viridisLite(v.0.4.0)</em>, <em>yaml(v.2.2.1)</em>, <em>utf8(v.1.2.2)</em>, <em>plotly(v.4.9.4.1)</em>, <em>rlang(v.0.4.11)</em>, <em>jquerylib(v.0.1.4)</em>, <em>pillar(v.1.6.3)</em>, <em>glue(v.1.4.2)</em>, <em>plyr(v.1.8.6)</em>, <em>lifecycle(v.1.0.1)</em>, <em>stringr(v.1.4.0)</em>, <em>munsell(v.0.5.0)</em>, <em>gtable(v.0.3.0)</em>, <em>htmlwidgets(v.1.5.4)</em>, <em>evaluate(v.0.14)</em>, <em>forcats(v.0.5.1)</em>, <em>fastmap(v.1.1.0)</em>, <em>crosstalk(v.1.1.1)</em>, <em>curl(v.4.3.2)</em>, <em>fansi(v.0.5.0)</em>, <em>Rcpp(v.1.0.7)</em>, <em>scales(v.1.1.1)</em>, <em>DT(v.0.19)</em>, <em>jsonvalidate(v.1.1.0)</em>, <em>clinUtils(v.0.1.0)</em>, <em>jsonlite(v.1.7.2)</em>, <em>hms(v.1.1.1)</em>, <em>ggplot2(v.3.3.5)</em>, <em>digest(v.0.6.28)</em>, <em>stringi(v.1.7.4)</em>, <em>bookdown(v.0.24)</em>, <em>dplyr(v.1.0.7)</em>, <em>grid(v.4.1.1)</em>, <em>tools(v.4.1.1)</em>, <em>magrittr(v.2.0.1)</em>, <em>sass(v.0.4.0)</em>, <em>lazyeval(v.0.2.2)</em>, <em>tibble(v.3.1.5)</em>, <em>crayon(v.1.4.1)</em>, <em>tidyr(v.1.1.4)</em>, <em>pkgconfig(v.2.0.3)</em>, <em>ellipsis(v.0.3.2)</em>, <em>data.table(v.1.14.2)</em>, <em>rmarkdown(v.2.11)</em>, <em>httr(v.1.4.2)</em>, <em>R6(v.2.5.1)</em> and <em>compiler(v.4.1.1)</em></p>
+<p><strong>other attached packages:</strong> <em>plyr(v.1.8.6)</em>, <em>inTextSummaryTable(v.3.1.1)</em>, <em>reshape2(v.1.4.4)</em>, <em>plotly(v.4.10.0)</em>, <em>ggplot2(v.3.3.5)</em>, <em>clinUtils(v.0.1.1)</em>, <em>clinDataReview(v.1.2.2)</em>, <em>pander(v.0.6.4)</em> and <em>knitr(v.1.37)</em></p>
+<p><strong>loaded via a namespace (and not attached):</strong> <em>ggrepel(v.0.9.1)</em>, <em>Rcpp(v.1.0.8)</em>, <em>tidyr(v.1.2.0)</em>, <em>digest(v.0.6.29)</em>, <em>utf8(v.1.2.2)</em>, <em>R6(v.2.5.1)</em>, <em>evaluate(v.0.15)</em>, <em>httr(v.1.4.2)</em>, <em>pillar(v.1.7.0)</em>, <em>gdtools(v.0.2.4)</em>, <em>rlang(v.1.0.1)</em>, <em>lazyeval(v.0.2.2)</em>, <em>uuid(v.1.0-3)</em>, <em>data.table(v.1.14.2)</em>, <em>DT(v.0.20)</em>, <em>flextable(v.0.6.10)</em>, <em>rmarkdown(v.2.11)</em>, <em>labeling(v.0.4.2)</em>, <em>stringr(v.1.4.0)</em>, <em>htmlwidgets(v.1.5.4)</em>, <em>munsell(v.0.5.0)</em>, <em>compiler(v.4.1.2)</em>, <em>xfun(v.0.29)</em>, <em>pkgconfig(v.2.0.3)</em>, <em>systemfonts(v.1.0.4)</em>, <em>base64enc(v.0.1-3)</em>, <em>htmltools(v.0.5.2)</em>, <em>tidyselect(v.1.1.1)</em>, <em>tibble(v.3.1.6)</em>, <em>bookdown(v.0.24)</em>, <em>jsonvalidate(v.1.3.2)</em>, <em>fansi(v.1.0.2)</em>, <em>viridisLite(v.0.4.0)</em>, <em>crayon(v.1.5.0)</em>, <em>dplyr(v.1.0.8)</em>, <em>withr(v.2.4.3)</em>, <em>grid(v.4.1.2)</em>, <em>jsonlite(v.1.7.3)</em>, <em>gtable(v.0.3.0)</em>, <em>lifecycle(v.1.0.1)</em>, <em>magrittr(v.2.0.2)</em>, <em>scales(v.1.1.1)</em>, <em>zip(v.2.2.0)</em>, <em>cli(v.3.2.0)</em>, <em>stringi(v.1.7.6)</em>, <em>farver(v.2.1.0)</em>, <em>xml2(v.1.3.3)</em>, <em>ellipsis(v.0.3.2)</em>, <em>generics(v.0.1.2)</em>, <em>vctrs(v.0.3.8)</em>, <em>cowplot(v.1.1.1)</em>, <em>tools(v.4.1.2)</em>, <em>forcats(v.0.5.1)</em>, <em>glue(v.1.6.1)</em>, <em>officer(v.0.4.1)</em>, <em>purrr(v.0.3.4)</em>, <em>hms(v.1.1.1)</em>, <em>crosstalk(v.1.2.0)</em>, <em>fastmap(v.1.1.0)</em>, <em>yaml(v.2.3.5)</em>, <em>colorspace(v.2.0-3)</em> and <em>haven(v.2.4.3)</em></p>
 </div>
 </div>
 

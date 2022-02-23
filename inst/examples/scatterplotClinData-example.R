@@ -6,6 +6,8 @@ labelVars <- attr(dataADaMCDISCP01, "labelVars")
 dataLB <- dataADaMCDISCP01$ADLBC
 dataDM <- dataADaMCDISCP01$ADSL
 dataLB <- annotateData(dataLB, annotations = list(data = dataDM))
+# subset of the data for the example
+dataLB <- subset(dataLB, VISIT %in% c("SCREENING 1", "WEEK 2", "WEEK 8"))
 
 ## time profile
 
@@ -22,7 +24,7 @@ scatterplotClinData(
 )
 
 # with actual visit
-dataPlot$AVISIT <- with(dataPlot, reorder(AVISIT, AVISITN))
+dataPlot$AVISIT <- with(dataPlot, reorder(trimws(AVISIT), AVISITN))
 scatterplotClinData(
 	data = dataPlot, 
 	xVar = "AVISIT",
@@ -31,6 +33,8 @@ scatterplotClinData(
 	aesLineVar = list(group = "USUBJID", color = "TRTP"),
 	labelVars = labelVars
 )
+
+\dontrun{
 
 # add number of subjects below each visit
 
@@ -53,6 +57,7 @@ scatterplotClinData(
 	labelVars = labelVars
 )
 
+}
 
 ## pairwise comparison plot of two parameters of interest:
 
@@ -77,6 +82,8 @@ scatterplotClinData(
 	subtitle = "Visualization is split by visit",
 	caption = "Points are colored by subject ID"
 )
+
+\dontrun{
 
 # scatterplot with all visits, link subjects
 xLab <- getLabelParamcd(paramcd = "ALT", data = dataLB, 
@@ -126,10 +133,10 @@ scatterplotClinData(
 	refLinePars = list(
 		list(slope = 1, intercept = 0, linetype = 1, color = "black", 
 			label = FALSE),
-		list(xintercept = "A1LO", linetype = 2, color = "blue"),
 		list(yintercept = "A1LO", linetype = 2, color = "blue"),
-		list(xintercept = "A1HI", linetype = 2, color = "purple"),
 		list(yintercept = "A1HI", linetype = 2, color = "purple", 
 			label = "Reference Range Upper Limit")
 	)
 )
+
+}
