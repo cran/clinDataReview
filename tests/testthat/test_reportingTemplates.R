@@ -4,7 +4,7 @@ library(yaml)
 library(jsonlite)
 
 test_that("A config file with all required parameters is checked successfully", {
-      
+  
 	# R CMD check runs on package binary, so without 'inst' folder:
 	refConfig <- system.file(package = "clinDataReview", "template", "divisionTemplate.json")
       
@@ -17,8 +17,13 @@ test_that("A config file with all required parameters is checked successfully", 
 		),
 		configFileDivision
 	)
+	
 	expect_silent(
-		checkConfigFile(configFileDivision, configSpecFile = refConfig)
+		checkConfigFile(
+			configFile = basename(configFileDivision), 
+			configDir = dirname(configFileDivision),
+			configSpecFile = refConfig
+		)
 	)
       
 })
@@ -38,9 +43,106 @@ test_that("An error is generated if a config file with missing parameters is che
 	refConfig <- system.file(package = "clinDataReview", "template", "divisionTemplate.json")
 			
 	expect_error(
-		checkConfigFile(configFileDivision, configSpecFile = refConfig)
+		checkConfigFile(
+			configFile = basename(configFileDivision), 
+			configDir = dirname(configFileDivision),
+			configSpecFile = refConfig
+		)
 	)
 	
+})
+
+test_that("A chapter split is correctly specified as a character with an expected value", {
+  
+  configFileDivision <- tempfile(pattern = "configDivision", fileext = ".yml")
+  write_yaml(
+    x = list(reportTitle = "Study name", split_by = 'chapter', 
+      template = "divisionTemplate.Rmd", templatePackage = "clinDataReview"),
+    file = configFileDivision
+  )
+  
+  # R CMD check runs on package binary, so without 'inst' folder:
+  refConfig <- system.file(package = "clinDataReview", "template", "divisionTemplate.json")
+  
+  expect_error(
+    checkConfigFile(
+      configFile = basename(configFileDivision), 
+      configDir = dirname(configFileDivision),
+      configSpecFile = refConfig
+    ),
+    NA
+  )
+  
+})
+
+test_that("An error is generated if the chapter split is specified as a character with a non expected value", {
+  
+  configFileDivision <- tempfile(pattern = "configDivision", fileext = ".yml")
+  write_yaml(
+    x = list(reportTitle = "Study name", split_by = '1', 
+      template = "divisionTemplate.Rmd", templatePackage = "clinDataReview"),
+    file = configFileDivision
+  )
+  
+  # R CMD check runs on package binary, so without 'inst' folder:
+  refConfig <- system.file(package = "clinDataReview", "template", "divisionTemplate.json")
+  
+  expect_error(
+    checkConfigFile(
+      configFile = basename(configFileDivision), 
+      configDir = dirname(configFileDivision),
+      configSpecFile = refConfig
+    ),
+    ".+split_by.+"
+  )
+  
+})
+
+test_that("A chapter split is correctly specified as an integer with an expected value", {
+  
+  configFileDivision <- tempfile(pattern = "configDivision", fileext = ".yml")
+  write_yaml(
+    x = list(reportTitle = "Study name", split_by = 7L, 
+      template = "divisionTemplate.Rmd", templatePackage = "clinDataReview"),
+    file = configFileDivision
+  )
+  
+  # R CMD check runs on package binary, so without 'inst' folder:
+  refConfig <- system.file(package = "clinDataReview", "template", "divisionTemplate.json")
+  
+  expect_error(
+    checkConfigFile(
+      configFile = basename(configFileDivision), 
+      configDir = dirname(configFileDivision),
+      configSpecFile = refConfig
+    ),
+    NA
+  )
+  
+})
+
+
+test_that("An error is generated if the chapter split is specified as an integer with a non expected value", {
+  
+  configFileDivision <- tempfile(pattern = "configDivision", fileext = ".yml")
+  write_yaml(
+    x = list(reportTitle = "Study name", split_by = 8L, 
+      template = "divisionTemplate.Rmd", templatePackage = "clinDataReview"),
+    file = configFileDivision
+  )
+  
+  # R CMD check runs on package binary, so without 'inst' folder:
+  refConfig <- system.file(package = "clinDataReview", "template", "divisionTemplate.json")
+  
+  expect_error(
+    checkConfigFile(
+      configFile = basename(configFileDivision), 
+      configDir = dirname(configFileDivision),
+      configSpecFile = refConfig
+    ),
+    ".+split_by.+"
+  )
+  
 })
 
 test_that("The path to a template report is correctly extracted from the installed package", {

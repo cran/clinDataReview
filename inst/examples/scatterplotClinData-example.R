@@ -34,9 +34,13 @@ scatterplotClinData(
 	labelVars = labelVars
 )
 
+
+
 \dontrun{
 
 # add number of subjects below each visit
+	
+if (requireNamespace("inTextSummaryTable", quietly = TRUE)) {
 
 # compute number of subjects by visit
 summaryTable <- inTextSummaryTable::computeSummaryStatisticsTable(
@@ -59,18 +63,23 @@ scatterplotClinData(
 
 }
 
+}
+
 ## pairwise comparison plot of two parameters of interest:
 
 # format data long -> wide format (one column per lab param)
 dataPlot <- subset(dataLB, PARAMCD %in% c("ALT", "AST"))
-library(reshape2)
-dataPlotWide <- dcast(
+dataPlot <- stats::aggregate(
+	LBSTRESN ~ USUBJID + VISIT + VISITNUM + PARAMCD, 
 	data = dataPlot,
-	formula = USUBJID + VISIT + VISITNUM ~ PARAMCD, 
-	value.var = "LBSTRESN",
-	fun.aggregate = mean
+	FUN = mean
 )
-
+dataPlotWide <- stats::reshape(
+	data = dataPlot,
+	timevar = "PARAMCD", idvar = c("USUBJID", "VISIT", "VISITNUM"),
+	direction = "wide"
+)
+colnames(dataPlotWide) <- sub("^LBSTRESN.", "", colnames(dataPlotWide))
 # scatterplot per visit
 scatterplotClinData(
 	data = dataPlotWide, 
@@ -139,4 +148,55 @@ scatterplotClinData(
 	)
 )
 
+
+## scatterplot with smoothing layer
+
+data <- data.frame(
+  subj = c(rep('subj1', 20), rep('subj2', 20)),
+  time = rep( 1:20 , 2 ),
+  response =  c(1:20, 50:31) + runif(min =-3, max = +3, 40),
+  treat =  rep(c('trA', 'trB'), 20),
+  stringsAsFactors = FALSE
+)
+
+# smoothing per subject
+smoothPlot <- scatterplotClinData(
+  data = data,
+  xVar = "time", yVar = "response",
+  aesPointVar = list(color = "treat"),
+  aesLineVar = list(group = 'subj'),
+  linePars = list(linetype='dotted'),
+  aesSmoothVar = list(color='subj', group='subj'), 
+  smoothPars =  list(alpha=0.5, size=0.3 , se=TRUE, color = 'black')
+)
+smoothPlot
+
+
+# plot smoothing over subjects
+smoothPlot <- scatterplotClinData(
+  data = data,
+  xVar = "time", yVar = "response",
+  aesPointVar = list(color = "treat"),
+  aesLineVar = list(group = 'subj'),
+  linePars = list(linetype='dotted'),
+  aesSmoothVar = list(), 
+  smoothPars =  list(alpha=0.5, size=0.3 , se=TRUE, color = 'black')
+)
+smoothPlot
+
+}
+
+# add a selection box
+if(interactive()){
+  dataPlot <- subset(dataLB, PARAMCD == "ALT")
+  dataPlot$TRTA <- with(dataPlot, reorder(TRTA, TRTAN))
+  scatterplotClinData(
+    data = dataPlot, 
+    xVar = "ADY",
+    yVar = "LBSTRESN",
+    aesPointVar = list(fill = "TRTA", color = "TRTA"),
+    aesLineVar = list(group = "USUBJID", color = "TRTA"),
+    selectVars = "TRTA",
+    labelVars = labelVars
+  )
 }

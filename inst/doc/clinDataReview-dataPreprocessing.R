@@ -1,7 +1,6 @@
 ## ----options, echo = FALSE, message = FALSE-----------------------------------------------------------------------------------------------------------------------------
 
 library(knitr)
-library(pander)
 opts_chunk$set(
     echo = TRUE, 
     results = 'asis', 
@@ -19,7 +18,6 @@ heightLineIn  <- 0.2
 ## ----loadPackages, message = FALSE--------------------------------------------------------------------------------------------------------------------------------------
 
 library(clinDataReview)
-library(pander)
 
 
 ## ----loadData-----------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -41,7 +39,7 @@ dataLBAnnot <- annotateData(
     annotations = list(data = dataDM, vars = c("ETHNIC", "ARM")), 
     verbose = TRUE
 )
-pander(
+knitr::kable(
     head(dataLBAnnot), 
     caption = paste("Laboratory parameters annotated with",
         "demographics information with the `annotatedData` function"
@@ -55,7 +53,7 @@ dataLBAnnotTreatment <- filterData(
     filters = list(var = "ARM", value = "Placebo", rev = TRUE), 
     verbose = TRUE
 )
-pander(
+knitr::kable(
     unique(dataLBAnnotTreatment[, c("USUBJID", "ARM")]), 
     caption = paste("Subset of laboratory parameters filtered",
         "with placebo patients"
@@ -75,7 +73,7 @@ eDishData <- transformData(
     verbose = TRUE,
     labelVars = labelVars
 )
-pander(head(eDishData))
+knitr::kable(head(eDishData))
 
 
 ## ----processData--------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -94,6 +92,6 @@ identical(dataLBAnnotTreatment, dataLBAnnotTreatment2)
 
 ## ----sessionInfo, echo = FALSE------------------------------------------------------------------------------------------------------------------------------------------
 
-pander(sessionInfo())
+print(sessionInfo())
 
 

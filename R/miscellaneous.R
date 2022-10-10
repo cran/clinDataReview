@@ -196,10 +196,7 @@ collapseHtmlContent <- function(
 	title = "Click to show or hide"
 	){
 	
-	btnStyle <- paste0(
-		#"border: none;",
-		"background-color: transparent"
-	)
+	btnStyle <- "background-color: transparent"
 		
 	btn <- tags$input(
 		type = "button", 
@@ -215,10 +212,7 @@ collapseHtmlContent <- function(
 		class = "hideshow_cnt"
 	)
 	
-	res <- tagList(
-		btn, 
-		btnContent, br(), br()
-	)
+	res <- tagList(btn, btnContent, br(), br())
 	
 	res <- prependContent(res, getJsDepClinDataReview(type = "collapsibleButton"))
 	
@@ -280,8 +274,7 @@ varToFm <- function(var){
 #' of lines
 #' @author Laure Cougnaud
 #' @examples 
-#' countNLines(x = c("A\nB", "blabla", "This\nis\na\nsentence."))
-#' @export
+#' clinDataReview:::countNLines(x = c("A\nB", "blabla", "This\nis\na\nsentence."))
 countNLines <- function(x){
 	
 	lines <- regmatches(

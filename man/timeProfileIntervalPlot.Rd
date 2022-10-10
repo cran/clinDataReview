@@ -37,12 +37,14 @@ timeProfileIntervalPlot(
   idLab = getLabelVar(idVar, labelVars = labelVars),
   pathVar = NULL,
   pathLab = getLabelVar(pathVar, labelVars = labelVars),
+  id = paste0("plotClinData", sample.int(n = 1000, size = 1)),
+  selectVars = NULL,
+  selectLab = getLabelVar(selectVars, labelVars = labelVars),
   table = FALSE,
   tableVars,
   tableLab,
   tableButton = TRUE,
   tablePars = list(),
-  id = paste0("plotClinData", sample.int(n = 1000, size = 1)),
   verbose = FALSE
 )
 }
@@ -137,6 +139,19 @@ in the table}
 \item{pathLab}{String with label for \code{pathVar},
 included in the collapsible row in the table.}
 
+\item{id}{String with general id for the plot:
+\itemize{
+\item{'id' is used as \code{group} for the \code{\link[crosstalk]{SharedData}}}
+\item{'button:[id]' is used as button ID if \code{table} is TRUE}
+}
+If not specified, a random id, as 'plotClinData[X]' is used.}
+
+\item{selectVars}{(optional) Character vector with variable(s) from \code{data}
+for which a selection box should be included. This enables to select the data
+displayed in the plot (and associated table).}
+
+\item{selectLab}{(Named) character vector with label for \code{selectVars}.}
+
 \item{table}{Logical, if TRUE (FALSE by default)
 returns also a \code{datatable} containing the plot data.
 The plot and table are linked when included in a Rmarkdown document: 
@@ -157,13 +172,6 @@ the table is included within an HTML button.}
 \item{tablePars}{List with parameters passed to the
 \code{\link[clinUtils]{getClinDT}} function.}
 
-\item{id}{String with general id for the plot:
-\itemize{
-\item{'id' is used as \code{group} for the \code{\link[crosstalk]{SharedData}}}
-\item{'button:[id]' is used as button ID if \code{table} is TRUE}
-}
-If not specified, a random id, as 'plotClinData[X]' is used.}
-
 \item{verbose}{Logical, if TRUE (FALSE by default) progress messages are printed
 in the current console.
 For the visualizations, progress messages during download
@@ -182,6 +190,59 @@ a \code{clinDataReview} object, a.k.a a list with the
 \description{
 Visualize time intervals across subjects/parameters.
 }
+\examples{
+library(clinUtils)
+
+data(dataADaMCDISCP01)
+labelVars <- attr(dataADaMCDISCP01, "labelVars")
+
+dataAE <- dataADaMCDISCP01$ADAE
+
+# basic plot
+timeProfileIntervalPlot(
+	data = dataAE,
+	paramVar = "USUBJID",
+	# time-variables
+	timeStartVar = "ASTDY",
+	timeEndVar = "ASTDY",
+	# colored by severity
+	colorVar = "AESEV",
+	labelVars = labelVars
+)
+
+# add caption & subtitle
+timeProfileIntervalPlot(
+	data = dataAE,
+	paramVar = "USUBJID",
+	timeStartVar = "ASTDY",
+	timeEndVar = "ASTDY",
+	colorVar = "AESEV",
+	labelVars = labelVars,
+	title = "Adverse events",
+	subtitle = "Time intervals",
+	caption = "Day is relative to the study baseline"
+)
+
+# add a selection box
+if(interactive()){
+  timeProfileIntervalPlot(
+    data = dataAE,
+    paramVar = "USUBJID",
+    # time-variables
+    timeStartVar = "ASTDY",
+    timeEndVar = "ASTDY",
+    # colored by severity
+    colorVar = "AESEV",
+    labelVars = labelVars,
+    selectVars = "AEDECOD"
+  )
+}
+}
+\seealso{
+Other Clinical data visualization of individual profiles.: 
+\code{\link{scatterplotClinData}()}
+}
 \author{
 Laure Cougnaud
 }
+\concept{Clinical data visualization of individual profiles.}

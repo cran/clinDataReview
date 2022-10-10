@@ -4,9 +4,10 @@ library(yaml)
 library(rmarkdown)
 library(haven)
 
-# Note: these tests might generate the pandoc warning:
-# This document format requires a nonempty <title> element.
-# That can be ignored
+# fix for pandoc warning: 'This document format requires a nonempty <title> element.'
+outputOpts <- list(pandoc_args = 
+	rmarkdown::pandoc_metadata_arg(name = "pagetitle", value = "test report")
+)
 
 test_that("The division template is successfully rendered", {
 			
@@ -37,7 +38,8 @@ test_that("The division template is successfully rendered", {
 			input = pathTemplate,
 			output_dir = dir,
 			intermediates_dir = dir,
-			quiet = TRUE
+			quiet = TRUE,
+			output_options = outputOpts
 		),
 		NA
 	)
@@ -82,7 +84,8 @@ test_that("The listing template is successfully rendered", {
 			input = pathTemplate,
 			output_dir = dir,
 			intermediates_dir = dir,
-			quiet = TRUE
+			quiet = TRUE,
+			output_options = outputOpts
 		),
 		NA
   	)
@@ -90,6 +93,68 @@ test_that("The listing template is successfully rendered", {
 	
 	detach(params);rm(params)
       
+})
+
+test_that("The listing template with multiple input data files is successfully rendered", {
+  
+  skip_on_cran()
+  
+  dir <- tempfile("listing")
+  dir.create(dir)
+  
+  templateName <- "listingTemplate.Rmd"
+  
+  # create example datasets
+  
+  # vital signs
+  dataADVS <- data.frame(
+    PARAM = "Heart beat",
+    USUBJID = c(1, 2),
+    VISIT = c("Baseline", "Week 1"),
+    AVAL = c(2, 3),
+    stringsAsFactors = FALSE
+  )
+  write_xpt(dataADVS, file.path(dir, "advs.xpt"))
+  
+  # lab datasets
+  dataADLB <- data.frame(
+    PARAM = "GP",
+    USUBJID = c(1, 2),
+    VISIT = c("Baseline", "Week 1"),
+    AVAL = c(3, 6),
+    stringsAsFactors = FALSE
+  )
+  write_xpt(dataADLB, file.path(dir, "adlb.xpt"))
+  
+  # set parameters
+  params <- list(
+    pathDataFolder = dir,
+    template = templateName,
+    templatePackage = "clinDataReview",
+    reportTitle = "Listing of the lab and vital signs",
+    reportTitleLevel = 2,
+    dataFileName = c("advs.xpt", "adlb.xpt"),
+    tableParams = list(tableVars = c("PARAM", "USUBJID", "VISIT", "AVAL"))
+  )
+  
+  # run report
+  pathTemplate <- system.file("template", templateName, 
+    package = "clinDataReview")
+  
+  expect_error(
+    outputFile <- rmarkdown::render(
+      input = pathTemplate,
+      output_dir = dir,
+      intermediates_dir = dir,
+      quiet = TRUE,
+	  output_options = outputOpts
+    ),
+    NA
+  )
+  expect_true(file.exists(outputFile))
+  
+  detach(params);rm(params)
+  
 })
 
 test_that("The count visualization template is successfully rendered", {
@@ -127,7 +192,8 @@ test_that("The count visualization template is successfully rendered", {
 			input = pathTemplate,
 			output_dir = dir,
 			intermediates_dir = dir,
-			quiet = TRUE
+			quiet = TRUE,
+			output_options = outputOpts
 		),
 		NA
 	)
@@ -173,7 +239,8 @@ test_that("The plot template is successfully rendered", {
 			input = pathTemplate,
 			output_dir = dir,
 			intermediates_dir = dir,
-			quiet = TRUE
+			quiet = TRUE,
+			output_options = outputOpts
 		),
 		NA
   	)
@@ -223,7 +290,8 @@ test_that("The summary plot template is successfully rendered", {
 			input = pathTemplate,
 			output_dir = dir,
 			intermediates_dir = dir,
-			quiet = TRUE
+			quiet = TRUE,
+			output_options = outputOpts
 		),
 		NA
 	)
@@ -271,7 +339,8 @@ test_that("The summary table template is successfully rendered", {
 			input = pathTemplate,
 			output_dir = dir,
 			intermediates_dir = dir,
-			quiet = TRUE
+			quiet = TRUE,
+			output_options = outputOpts
 		),
 		NA
 	)
@@ -325,7 +394,8 @@ test_that("The patient profile template is successfully rendered", {
 			input = pathTemplate,
 			output_dir = dir,
 			intermediates_dir = dir,
-			quiet = TRUE
+			quiet = TRUE,
+			output_options = outputOpts
 		),
 		NA
 	)

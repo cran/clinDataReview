@@ -19,7 +19,6 @@ hasPandoc <- rmarkdown::pandoc_available()
 ## ----loadLibraries------------------------------------------------------------------------------------------------------------------------------------------------------
 
 library(clinDataReview)
-library(pander)
 library(plotly)
 
 
@@ -97,6 +96,7 @@ scatterplotClinData(
     yVar = "LBSTRESN",
     aesPointVar = list(color = "TRTP", fill = "TRTP"),
     aesLineVar = list(group = "USUBJID", color = "TRTP"),
+    linePars = list(size = 0.5, alpha = 0.7),
     hoverVars = c("USUBJID", "VISIT", "ADY", "LBSTRESN", "TRTP"),
     labelVars = labelVars,
     xPars = list(breaks = visitLab, labels = names(visitLab)),
@@ -119,16 +119,19 @@ scatterplotClinData(
 
 
 ## ----scatterplot, eval = hasPandoc--------------------------------------------------------------------------------------------------------------------------------------
-
 # format data long -> wide format (one column per lab param)
 dataPlot <- subset(dataLB, PARAMCD %in% c("ALT", "ALB"))
-library(reshape2)
-dataPlotWide <- dcast(
-    data = dataPlot,
-    formula = USUBJID + VISIT + VISITNUM ~ PARAMCD, 
-    value.var = "LBSTRESN",
-    fun.aggregate = mean
+dataPlot <- stats::aggregate(
+	LBSTRESN ~ USUBJID + VISIT + VISITNUM + PARAMCD, 
+	data = dataPlot,
+	FUN = mean
 )
+dataPlotWide <- stats::reshape(
+	data = dataPlot,
+	timevar = "PARAMCD", idvar = c("USUBJID", "VISIT", "VISITNUM"),
+	direction = "wide"
+)
+colnames(dataPlotWide) <- sub("^LBSTRESN.", "", colnames(dataPlotWide))
 
 # link to patient profiles
 if(interactive())
@@ -262,9 +265,7 @@ timeProfileIntervalPlot(
 )
 
 
-## ----computeSummaryStatistics-categoricalVariable-----------------------------------------------------------------------------------------------------------------------
-
-library(inTextSummaryTable)
+## ----computeSummaryStatistics-categoricalVariable, eval = requireNamespace("inTextSummaryTable", quietly = TRUE)--------------------------------------------------------
 
 # total counts: Safety Analysis Set (patients with start date for the first treatment)
 dataTotal <- subset(dataDM, RFSTDTC != "")
@@ -304,7 +305,7 @@ if(interactive()){
 
 # get counts (records, subjects, % subjects) + stats with subjects profiles path
 statsPP <- c(
-    getStats(type = "count"),
+	inTextSummaryTable::getStats(type = "count"),
     if(interactive())
 		list(
         	patientProfilePath = quote(statPatientProfilePath),
@@ -319,7 +320,7 @@ dataAE$AESEV <- factor(
 dataAE$AESEVN <- as.numeric(dataAE$AESEV)
 
 # compute adverse event table
-tableAE <- computeSummaryStatisticsTable(
+tableAE <- inTextSummaryTable::computeSummaryStatisticsTable(
     
     data = dataAE,
     rowVar = c("AESOC", "AEDECOD"),
@@ -339,14 +340,14 @@ tableAE <- computeSummaryStatisticsTable(
     statsExtra = if(interactive())	statsExtraPP
 
 )
-pander(head(tableAE),
+knitr::kable(head(tableAE),
     caption = paste("Extract of the Adverse Event summary table",
         "used for the sunburst and barplot visualization"
     )
 )
 
 
-## ----sunburst, eval = hasPandoc-----------------------------------------------------------------------------------------------------------------------------------------
+## ----sunburst, eval = hasPandoc & requireNamespace("inTextSummaryTable", quietly = TRUE)--------------------------------------------------------------------------------
 
 dataSunburst <- tableAE
 
@@ -364,7 +365,7 @@ sunburstClinData(
 )
 
 
-## ----treemap, eval = hasPandoc------------------------------------------------------------------------------------------------------------------------------------------
+## ----treemap, eval = hasPandoc & requireNamespace("inTextSummaryTable", quietly = TRUE)---------------------------------------------------------------------------------
 
 dataTreemap <- tableAE
 
@@ -382,7 +383,7 @@ treemapClinData(
 )
 
 
-## ----barplot, eval = hasPandoc------------------------------------------------------------------------------------------------------------------------------------------
+## ----barplot, eval = hasPandoc & requireNamespace("inTextSummaryTable", quietly = TRUE)---------------------------------------------------------------------------------
 
 dataPlot <- subset(tableAE, AEDECOD != "Total")
 
@@ -430,9 +431,7 @@ if(interactive()){
 }
 
 
-## ----computeSummaryStatistics-continuousVariable------------------------------------------------------------------------------------------------------------------------
-
-library(inTextSummaryTable)
+## ----computeSummaryStatistics-continuousVariable, eval = requireNamespace("inTextSummaryTable", quietly = TRUE)---------------------------------------------------------
 
 # Specify extra summarizations besides the standard stats
 # When the data is summarized,
@@ -449,7 +448,7 @@ if(interactive())
 	
 # get default counts + stats with subjects profiles path
 statsPP <- c(
-    getStats(x = dataVSDIABP$AVAL, type = "summary"),
+    inTextSummaryTable::getStats(x = dataVSDIABP$AVAL, type = "summary"),
 	if(interactive())
 	    list(
 	        patientProfilePath = quote(statPatientProfilePath),
@@ -458,7 +457,7 @@ statsPP <- c(
 )
 
 # compute summary table of actual value
-summaryTableCont <- computeSummaryStatisticsTable(
+summaryTableCont <- inTextSummaryTable::computeSummaryStatisticsTable(
     
     data = dataVSDIABP,
     rowVar = c("AVISIT", "ATPT"),
@@ -473,9 +472,9 @@ summaryTableCont <- computeSummaryStatisticsTable(
     statsExtra = if(interactive())	statsExtraPP
 
 )
-pander(head(summaryTableCont, 1))
+knitr::kable(head(summaryTableCont, 1))
 
-## ----errorbarClinData, eval = hasPandoc---------------------------------------------------------------------------------------------------------------------------------
+## ----errorbarClinData, eval = hasPandoc & requireNamespace("inTextSummaryTable", quietly = TRUE)------------------------------------------------------------------------
 
 dataPlot <- subset(summaryTableCont, !isTotal)
 
@@ -646,6 +645,6 @@ options(clinDataReview.shapes = shapesDefault)
 
 ## ----sessionInfo, echo = FALSE------------------------------------------------------------------------------------------------------------------------------------------
 
-pander(sessionInfo())
+print(sessionInfo())
 
 

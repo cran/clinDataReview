@@ -11,8 +11,13 @@ scatterplotClinData(
   xLab = getLabelVar(xVar, labelVars = labelVars),
   yLab = getLabelVar(yVar, labelVars = labelVars),
   aesPointVar = list(),
+  pointPars = list(),
   aesLineVar = list(),
+  linePars = list(),
   lineInclude = length(aesLineVar) > 0,
+  aesSmoothVar = list(),
+  smoothPars = list(),
+  smoothInclude = length(c(aesSmoothVar, smoothPars)) > 0,
   aesLab,
   xTrans = "identity",
   yTrans = "identity",
@@ -41,12 +46,14 @@ scatterplotClinData(
   idLab = getLabelVar(idVar, labelVars = labelVars),
   pathVar = NULL,
   pathExpand = FALSE,
+  id = paste0("plotClinData", sample.int(n = 1000, size = 1)),
+  selectVars = NULL,
+  selectLab = getLabelVar(selectVars, labelVars = labelVars),
   table = FALSE,
   tableVars,
   tableLab,
   tableButton = TRUE,
   tablePars = list(),
-  id = paste0("plotClinData", sample.int(n = 1000, size = 1)),
   verbose = FALSE
 )
 }
@@ -69,29 +76,34 @@ Color is used for the outside of the points, fill for the inside
 and the hover. Usually, you might want to specify both
 filling and coloring.}
 
+\item{pointPars}{List with parameters other than aesthetic variables to pass to \code{\link[ggplot2]{geom_point}},
+defaults to empty list.}
+
 \item{aesLineVar}{List with specification of aesthetic variable(s),
-for the line, passed to the \code{mapping} parameter of \code{\link[ggplot2]{geom_point}},
+for the line, passed to the \code{mapping} parameter of \code{\link[ggplot2]{geom_line}},
 e.g. \code{list(group = "USUBJID")}.}
+
+\item{linePars}{List with parameters other than aesthetic variables to pass to \code{\link[ggplot2]{geom_line}},
+defaults to empty list.}
 
 \item{lineInclude}{Logical, if TRUE (by default if \code{aesLineVar} is specified)
 include a scatterplot.}
 
+\item{aesSmoothVar}{List with specification of aesthetic variable(s),
+for the smoothing layer, passed to the \code{mapping} parameter of \code{\link[ggplot2]{geom_smooth}} defaults to empty list.}
+
+\item{smoothPars}{List with parameters other than aesthetic variables to pass to \code{\link[ggplot2]{geom_smooth}},
+defaults to empty list. Note this parameter overwrites other parameters set by \code{aesSmoothVar}.}
+
+\item{smoothInclude}{Logical, if TRUE (by default if one of \code{aesSmoothVar or smoothPars} is non-empty)}
+
 \item{aesLab}{Named character vector with labels for each aesthetic variable.}
 
-\item{xTrans}{Transformation for the x/y- variables,
+\item{xTrans, yTrans}{Transformation for the x/y- variables,
 passed to the \code{trans} parameter of \code{\link[ggplot2]{scale_x_continuous}}/
 \code{\link[ggplot2]{scale_y_continuous}}.}
 
-\item{yTrans}{Transformation for the x/y- variables,
-passed to the \code{trans} parameter of \code{\link[ggplot2]{scale_x_continuous}}/
-\code{\link[ggplot2]{scale_y_continuous}}.}
-
-\item{xPars}{List with extra parameters for x/y axis, passed to the
-\code{\link[ggplot2]{scale_x_continuous}}/
-\code{\link[ggplot2]{scale_y_continuous}} functions,
-besides \code{trans} and \code{limits}.}
-
-\item{yPars}{List with extra parameters for x/y axis, passed to the
+\item{xPars, yPars}{List with extra parameters for x/y axis, passed to the
 \code{\link[ggplot2]{scale_x_continuous}}/
 \code{\link[ggplot2]{scale_y_continuous}} functions,
 besides \code{trans} and \code{limits}.}
@@ -104,17 +116,9 @@ In case the variable(s) contain different elements
 by \code{xVar} or between facets, they are combined
 and displayed below each other.}
 
-\item{yLim}{Numeric vector of length 2 with limits for the x/y axes.}
+\item{xLim, yLim}{Numeric vector of length 2 with limits for the x/y axes.}
 
-\item{xLim}{Numeric vector of length 2 with limits for the x/y axes.}
-
-\item{yLimExpandData}{Logical (TRUE by default), should the
-limits specified via \code{xLim}/\code{yLim} be 
-expanded to include any data points outside of these
-limits?
-Please note that the same limits are set for all facets.}
-
-\item{xLimExpandData}{Logical (TRUE by default), should the
+\item{xLimExpandData, yLimExpandData}{Logical (TRUE by default), should the
 limits specified via \code{xLim}/\code{yLim} be 
 expanded to include any data points outside of these
 limits?
@@ -205,6 +209,19 @@ This should be set to TRUE only if multiple paths
 are included for each row in \code{pathVar}
 (e.g. in case of summary table).}
 
+\item{id}{String with general id for the plot:
+\itemize{
+\item{'id' is used as \code{group} for the \code{\link[crosstalk]{SharedData}}}
+\item{'button:[id]' is used as button ID if \code{table} is TRUE}
+}
+If not specified, a random id, as 'plotClinData[X]' is used.}
+
+\item{selectVars}{(optional) Character vector with variable(s) from \code{data}
+for which a selection box should be included. This enables to select the data
+displayed in the plot (and associated table).}
+
+\item{selectLab}{(Named) character vector with label for \code{selectVars}.}
+
 \item{table}{Logical, if TRUE (FALSE by default)
 returns also a \code{datatable} containing the plot data.
 The plot and table are linked when included in a Rmarkdown document: 
@@ -224,13 +241,6 @@ the table is included within an HTML button.}
 
 \item{tablePars}{List with parameters passed to the
 \code{\link[clinUtils]{getClinDT}} function.}
-
-\item{id}{String with general id for the plot:
-\itemize{
-\item{'id' is used as \code{group} for the \code{\link[crosstalk]{SharedData}}}
-\item{'button:[id]' is used as button ID if \code{table} is TRUE}
-}
-If not specified, a random id, as 'plotClinData[X]' is used.}
 
 \item{verbose}{Logical, if TRUE (FALSE by default) progress messages are printed
 in the current console.
@@ -289,9 +299,13 @@ scatterplotClinData(
 	labelVars = labelVars
 )
 
+
+
 \dontrun{
 
 # add number of subjects below each visit
+	
+if (requireNamespace("inTextSummaryTable", quietly = TRUE)) {
 
 # compute number of subjects by visit
 summaryTable <- inTextSummaryTable::computeSummaryStatisticsTable(
@@ -314,18 +328,23 @@ scatterplotClinData(
 
 }
 
+}
+
 ## pairwise comparison plot of two parameters of interest:
 
 # format data long -> wide format (one column per lab param)
 dataPlot <- subset(dataLB, PARAMCD \%in\% c("ALT", "AST"))
-library(reshape2)
-dataPlotWide <- dcast(
+dataPlot <- stats::aggregate(
+	LBSTRESN ~ USUBJID + VISIT + VISITNUM + PARAMCD, 
 	data = dataPlot,
-	formula = USUBJID + VISIT + VISITNUM ~ PARAMCD, 
-	value.var = "LBSTRESN",
-	fun.aggregate = mean
+	FUN = mean
 )
-
+dataPlotWide <- stats::reshape(
+	data = dataPlot,
+	timevar = "PARAMCD", idvar = c("USUBJID", "VISIT", "VISITNUM"),
+	direction = "wide"
+)
+colnames(dataPlotWide) <- sub("^LBSTRESN.", "", colnames(dataPlotWide))
 # scatterplot per visit
 scatterplotClinData(
 	data = dataPlotWide, 
@@ -394,7 +413,62 @@ scatterplotClinData(
 	)
 )
 
+
+## scatterplot with smoothing layer
+
+data <- data.frame(
+  subj = c(rep('subj1', 20), rep('subj2', 20)),
+  time = rep( 1:20 , 2 ),
+  response =  c(1:20, 50:31) + runif(min =-3, max = +3, 40),
+  treat =  rep(c('trA', 'trB'), 20),
+  stringsAsFactors = FALSE
+)
+
+# smoothing per subject
+smoothPlot <- scatterplotClinData(
+  data = data,
+  xVar = "time", yVar = "response",
+  aesPointVar = list(color = "treat"),
+  aesLineVar = list(group = 'subj'),
+  linePars = list(linetype='dotted'),
+  aesSmoothVar = list(color='subj', group='subj'), 
+  smoothPars =  list(alpha=0.5, size=0.3 , se=TRUE, color = 'black')
+)
+smoothPlot
+
+
+# plot smoothing over subjects
+smoothPlot <- scatterplotClinData(
+  data = data,
+  xVar = "time", yVar = "response",
+  aesPointVar = list(color = "treat"),
+  aesLineVar = list(group = 'subj'),
+  linePars = list(linetype='dotted'),
+  aesSmoothVar = list(), 
+  smoothPars =  list(alpha=0.5, size=0.3 , se=TRUE, color = 'black')
+)
+smoothPlot
+
 }
+
+# add a selection box
+if(interactive()){
+  dataPlot <- subset(dataLB, PARAMCD == "ALT")
+  dataPlot$TRTA <- with(dataPlot, reorder(TRTA, TRTAN))
+  scatterplotClinData(
+    data = dataPlot, 
+    xVar = "ADY",
+    yVar = "LBSTRESN",
+    aesPointVar = list(fill = "TRTA", color = "TRTA"),
+    aesLineVar = list(group = "USUBJID", color = "TRTA"),
+    selectVars = "TRTA",
+    labelVars = labelVars
+  )
+}
+}
+\seealso{
+Other Clinical data visualization of individual profiles.: 
+\code{\link{timeProfileIntervalPlot}()}
 }
 \author{
 Laure Cougnaud

@@ -42,8 +42,14 @@ scatterplotClinData <- function(
 	xLab = getLabelVar(xVar, labelVars = labelVars),
 	yLab = getLabelVar(yVar, labelVars = labelVars), 
 	# aesthetics specifications
-	aesPointVar = list(), 
-	aesLineVar = list(), lineInclude = length(aesLineVar) > 0,
+	aesPointVar = list(),
+	pointPars = list(),
+	aesLineVar = list(),
+	linePars = list(),
+	lineInclude = length(aesLineVar) > 0,
+	aesSmoothVar = list(),
+	smoothPars = list(),
+	smoothInclude = length( c( aesSmoothVar, smoothPars ) ) > 0,
 	aesLab,
 	# axis specification:
 	xTrans = "identity", yTrans = "identity",
@@ -65,12 +71,16 @@ scatterplotClinData <- function(
 	hoverVars, hoverLab,
 	idVar = "USUBJID", idLab = getLabelVar(idVar, labelVars = labelVars),
 	pathVar = NULL, pathExpand = FALSE,
+	id = paste0("plotClinData", sample.int(n = 1000, size = 1)),
+	# selection
+	selectVars = NULL, selectLab = getLabelVar(selectVars, labelVars = labelVars),
+	# table
 	table = FALSE, 
 	tableVars,
 	tableLab,
 	tableButton = TRUE, tablePars = list(),
-	id = paste0("plotClinData", sample.int(n = 1000, size = 1)),
 	verbose = FALSE){
+  
 
 	if(missing(aesLab)){
 		
@@ -96,11 +106,12 @@ scatterplotClinData <- function(
 	# format data to: 'SharedData' object
 	if(missing(hoverVars)){
 		aesVar <- unlist(c(aesPointVar, aesLineVar))
-		hoverVars <- c(xVar, yVar, aesVar)
+		hoverVars <- c(xVar, yVar, aesVar, selectVars)
 		hoverLab <- c(
 			getLabelVar(var = xVar, label = xLab, labelVars = labelVars),
 			getLabelVar(var = yVar, label = yLab, labelVars = labelVars),
-			getLabelVar(var = aesVar, label = aesLab, labelVars = labelVars)
+			getLabelVar(var = aesVar, label = aesLab, labelVars = labelVars),
+			getLabelVar(var = selectVars, label = selectLab, labelVars = labelVars)
 		)
 	}else	if(missing(hoverLab)){
 		hoverLab <- getLabelVar(hoverVars, labelVars = labelVars)
@@ -125,27 +136,41 @@ scatterplotClinData <- function(
 		hoverByVar = idVars
 	)
 	
+
 	# create static plot:
 	gg <- staticScatterplotClinData(
 		data = dataSharedData, 
 		# x/y variables:
-		xVar = xVar, yVar = yVar, 
-		xLab = xLab, yLab = yLab, 
+		xVar = xVar,
+		yVar = yVar, 
+		xLab = xLab,
+		yLab = yLab, 
 		# aesthetics specifications
-		aesPointVar = aesPointVar, 
-		aesLineVar = aesLineVar, lineInclude = lineInclude,
+		aesPointVar = aesPointVar,
+		pointPars = pointPars,
+		aesLineVar = aesLineVar,
+		linePars = linePars,
+		lineInclude = lineInclude,
+		aesSmoothVar = aesSmoothVar,
+		smoothPars = smoothPars,
+		smoothInclude = smoothInclude,
 		aesLab = aesLab,
-		scalePars = scalePars,
 		# axis specification:
-		xTrans = xTrans, yTrans = yTrans,
-		xPars = xPars, yPars = yPars,
+		xTrans = xTrans,
+		yTrans = yTrans,
+		xPars = xPars,
+		yPars = yPars,
 		xLabVars = xLabVars,
-		yLim = yLim, xLim = xLim, 
-		yLimExpandData = yLimExpandData, xLimExpandData = xLimExpandData,
+		yLim = yLim,
+		xLim = xLim, 
+		yLimExpandData = yLimExpandData,
+		xLimExpandData = xLimExpandData,
 		# general plot:
 		titleExtra = titleExtra,
 		title = title,
-		facetPars = facetPars, facetType = facetType,
+		facetPars = facetPars,
+		facetType = facetType,
+		scalePars = scalePars,
 		themePars = themePars,
 		refLinePars = refLinePars,
 		labelVars = labelVars,
@@ -196,13 +221,16 @@ scatterplotClinData <- function(
 	)
 
 	# convert static to interactive plot
-	pl <- formatPlotlyClinData(
+	res <- formatPlotlyClinData(
 		data = data, pl = pl,
 		idVar = idVar, pathVar = pathVar,
 		id = id, verbose = verbose,
 		# extract ID from 'key' column in 'data' of the plot output object
 		idFromDataPlot = TRUE, idVarPlot = "key",
-		pathDownload = FALSE # open in new tab
+		pathDownload = FALSE, # open in new tab
+		# selection
+		selectVars = selectVars, selectLab = selectLab, labelVars = labelVars,
+		keyVar = idVar
 	)
 	
 	# create associated table
@@ -225,11 +253,15 @@ scatterplotClinData <- function(
 			id = id,
 			labelVars = labelVars
 		)
-		res <- list(plot = pl, table = table)
-	
-		class(res) <- c("clinDataReview", class(res))
+		res <- c(
+		  if(inherits(res, "plotly")){list(plot = res)}else{res}, 
+		  list(table = table)
+		)
 		
-	}else res <- pl
+	}
+	
+	if(!inherits(res, "plotly"))
+	  class(res) <- c("clinDataReview", class(res))
 		
 	return(res)
 

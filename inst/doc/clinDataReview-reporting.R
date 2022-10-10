@@ -1,7 +1,6 @@
 ## ----options, echo = FALSE, message = FALSE-----------------------------------------------------------------------------------------------------------------------------
 
 library(knitr)
-library(pander)
 opts_chunk$set(
     echo = TRUE, 
     results = 'asis', 
@@ -51,9 +50,9 @@ library(clinDataReview)
 #  # only run the listings:
 #  clinDataReview::render_clinDataReviewReport(configFiles = list.files(pattern = "listing", "config"))
 
-## ----convertMdToHtml, eval = FALSE--------------------------------------------------------------------------------------------------------------------------------------
+## ----postProcessReport, eval = FALSE------------------------------------------------------------------------------------------------------------------------------------
 #  
-#  convertMdToHtml()
+#  postProcessReport()
 #  
 
 ## ----render_clinDataReviewReport-devel, eval = FALSE--------------------------------------------------------------------------------------------------------------------
@@ -77,8 +76,11 @@ library(clinDataReview)
 #  bookdown::render_book(input = c("index.Rmd", params$template), preview = TRUE)
 #  
 
+## ---- eval = FALSE------------------------------------------------------------------------------------------------------------------------------------------------------
+#  clinDataReview::render_clinDataReviewReport(nCores = 4)
+
 ## ----sessionInfo, echo = FALSE------------------------------------------------------------------------------------------------------------------------------------------
 
-pander(sessionInfo())
+print(sessionInfo())
 
 
