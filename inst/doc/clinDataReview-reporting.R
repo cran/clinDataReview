@@ -34,6 +34,11 @@ library(clinDataReview)
 #  clinDataReview::createRedirectPage()
 #  
 
+## ----convertReportToAspx, eval = FALSE----------------------------------------------------------------------------------------------------------------------------------
+#  
+#  clinDataReview::convertReportToAspx(reportDir = ".")
+#  
+
 ## ----zipclinDataReview, eval = FALSE------------------------------------------------------------------------------------------------------------------------------------
 #  
 #  clinDataReview::zipClinDataReview()
