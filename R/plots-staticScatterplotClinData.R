@@ -44,8 +44,8 @@
 #' Please note that the same limits are set for all facets.
 #' @param facetType String with facetting type, either:
 #' \itemize{
-#' \item{'wrap': }{\code{\link[ggplot2]{facet_wrap}}}
-#' \item{'grid': }{\code{\link[ggplot2]{facet_grid}}}
+#' \item 'wrap': \code{\link[ggplot2]{facet_wrap}}
+#' \item 'grid': \code{\link[ggplot2]{facet_grid}}
 #' }
 #' @param themePars List with general theme parameters 
 #' (see \code{\link[ggplot2]{theme}}).
@@ -53,8 +53,8 @@
 #' by default \code{xVar}, \code{yVar} and any aesthetic variables.
 #' @param geomType String with type of the geom used, either:
 #' \itemize{
-#' \item{'point': }{scatterplot with \code{\link[ggplot2]{geom_point}} is created}
-#' \item{'col': }{barplot with \code{\link[ggplot2]{geom_col}} is created}
+#' \item 'point': scatterplot with \code{\link[ggplot2]{geom_point}} is created
+#' \item 'col': barplot with \code{\link[ggplot2]{geom_col}} is created
 #' }
 #' @inheritParams clinDataReview-common-args
 #' @inheritParams setPaletteStaticScatterplotClinData
@@ -167,12 +167,11 @@ staticScatterplotClinData <- function(
 	      pars = linePars,
 	      generalPars = geomAes[c("color", "colour", "linetype")],
 	      layerFunction = geom_line
-	      )
+	     )
 #		}
 	}
 	
 	## scatterplot
-	
 	gg <- addLayerToScatterPlot(
 	  gg,
 	  aesVar = c(aesPointVar, if(!is.null(hoverVars))	{list(text = sym("hover"))}),
@@ -180,8 +179,7 @@ staticScatterplotClinData <- function(
 	  generalPars = geomAes[c("color", "colour", "fill", "shape")],
 	  layerFunction = switch(geomType, point = geom_point, col = geom_col),
 	  useHandlers = TRUE
-	  )
-	
+	 )
 	
 	## add smoothing layer
 	if(smoothInclude){
@@ -216,7 +214,7 @@ staticScatterplotClinData <- function(
 	}
 
 	setAxis <- function(gg, trans, pars, lims, axis){
-		if(trans != "identity"){
+		if(!(is.character(trans) && trans == "identity")){
 			if("trans" %in% names(pars))
 				warning(paste0("'trans' in parameters for ", axis, " axis ",
 					"are ignored, because specified in dedicated '", axis, "Trans' parameter."))
@@ -393,7 +391,13 @@ addLayerToScatterPlot <- function(gg, aesVar, pars, generalPars, layerFunction, 
   if( length(aesVar) > 0  ){
     aesVar <- sapply(aesVar, sym, simplify = FALSE)
   }
+  
+  # standardize color naming (US -> UK English spelling)
+  names(generalPars)[which(names(generalPars) == "color")] <- "colour"
+  names(pars)[which(names(pars) == "color")] <- "colour"
+  
   argsGeom <- modifyList(generalPars, pars)
+  
   argsGeom <- c(
     list(mapping = do.call(aes, aesVar)),
     argsGeom

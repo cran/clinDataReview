@@ -20,6 +20,7 @@ formatPlotlyClinData(
   selectVars = NULL,
   selectLab = getLabelVar(selectVars, labelVars = labelVars),
   keyVar = NULL,
+  keyHighlightBox = FALSE,
   labelVars = NULL,
   verbose = FALSE
 )
@@ -65,8 +66,8 @@ of the selected plot element.}
 
 \item{id}{String with general id for the plot:
 \itemize{
-\item{'id' is used as \code{group} for the \code{\link[crosstalk]{SharedData}}}
-\item{'button:[id]' is used as button ID if \code{table} is TRUE}
+\item 'id' is used as \code{group} for the \code{\link[crosstalk]{SharedData}}
+\item 'button:[id]' is used as button ID if \code{table} is TRUE
 }
 If not specified, a random id, as 'plotClinData[X]' is used.}
 
@@ -78,6 +79,9 @@ displayed in the plot (and associated table).}
 
 \item{keyVar}{String with unique key variable, identifying unique
 group for which the link between the table and the plot should be done.}
+
+\item{keyHighlightBox}{Logical, if TRUE (FALSE by default) a selectize box
+is included to highlight selected element(s) of the key variable.}
 
 \item{labelVars}{Named character vector containing variable labels.}
 

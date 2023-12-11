@@ -171,13 +171,13 @@ test_that("Documentation of template reports is created even if no reports are a
       
 	docRoxParType <- paste0(
 		"\\section{Parameter type}{Please note that the type mentioned below ",
-		"corresponds to the type in the config file (in YAML/JSON format).",
+		"corresponds to the type in the config file (in YAML/JSON format).\\cr\n",
 		"The mapping to R data type is as followed:",
 		"\\itemize{",
-		"\\item{string: }{character vector of length 1}",
-		"\\item{integer: }{integer vector of length 1}",
-		"\\item{array: }{vector/list without names}",
-		"\\item{object: }{list with names}",
+		"\\item string: character vector of length 1",
+		"\\item integer: integer vector of length 1",
+		"\\item array: vector/list without names",
+		"\\item object: list with names",
 		"}}"
 	)
 	expect_identical(docRoxParType, doc[1])

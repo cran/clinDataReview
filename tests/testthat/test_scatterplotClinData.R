@@ -108,6 +108,24 @@ test_that('Point parameters are set correctly in a scatterplot', {
   
 })
 
+test_that("Point parameters with 'colour' (UK English spelling) are set correctly in a scatterplot", {
+  
+  expect_silent(
+    pl <- scatterplotClinData(
+      data = exampleDataScatter(),
+      xVar = "time", yVar = "response",
+      pointPars = list(colour = 'red'),
+      idVar = "subj"
+    )
+  )
+  
+  plData <- plotly_build(pl)$x$data
+  plmarkerData <- plData[[which(sapply(plData, function(x){x$mode == 'markers'}))]]
+  colorRGB <- sub("^rgba\\((\\d{1,},\\d{1,},\\d{1,}),.+", "\\1\\2\\3", plmarkerData$marker$line$color)
+  expect_equal(object = colorRGB, expected = paste(col2rgb('red'), collapse =","))
+  
+})
+
 
 test_that('Line parameters are set correctly in a scatterplot', {
  
@@ -769,9 +787,30 @@ test_that("A selection variable is correctly included in a scatterplot", {
   expect_length(res$buttons, 1)
   
   # check button values
-  buttonData <- jsonlite::fromJSON(
-    txt = rapply(res$buttons[[1]], function(x) x, class = "json")
-  )
+  btnScriptTag <- htmltools::tagQuery(res$buttons)$find("script")$selectedTags()
+  buttonData <- jsonlite::fromJSON(txt = as.character(btnScriptTag[[1]]$children))
   expect_equal(object = buttonData$items$value, expected = levels(data$group))
+  
+})
+
+test_that("A box to highlight the elements of the ID variable is correctly included in a scatterplot", {
+  
+  data <- data.frame(
+    DY = c(1, 2, 1, 2),
+    AVAL = c(3, 4, 2, 6),
+    USUBJID = c(1, 1, 2, 2),
+    stringsAsFactors = FALSE
+  )	
+  
+  pl <- scatterplotClinData(
+    data = data, 
+    xVar = "DY",
+    yVar = "AVAL",
+    idHighlightBox = TRUE
+  )
+  
+  # check the output:
+  expect_s3_class(pl, "plotly")
+  expect_true(pl$x$highlight$selectize)
   
 })

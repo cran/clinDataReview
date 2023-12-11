@@ -8,9 +8,9 @@
 #' for each element of \code{idVar}.
 #' The report will be:
 #' \itemize{
-#' \item{opened in a different window in the browser if the user clicks on the 'p' (a.k.a 'profile') key
-#' when hovering on a point of the plot}
-#' \item{opened in the browser via hyperlink in the table}
+#' \item opened in a different window in the browser if the user clicks on the 
+#' 'p' (a.k.a 'profile') key when hovering on a point of the plot
+#' \item opened in the browser via hyperlink in the table
 #' }
 #' @param pathExpand Logical, if FALSE (by default)
 #' the path to subject-report is included in an hyperlink in the table,
@@ -18,16 +18,17 @@
 #' This should be set to TRUE only if multiple paths 
 #' are included for each row in \code{pathVar}
 #' (e.g. in case of summary table).
+#' @param idHighlightBox Logical, if TRUE (FALSE by default) a selectize box
+#' is included to highlight selected element(s) of the ID variable (\code{idVar}).
 #' @inheritParams staticScatterplotClinData
 #' @inheritParams clinDataReview-common-args
 #' @inheritParams tableClinData
 #' @return Either:
 #' \itemize{
-#' \item{if a \code{table} is requested: }{
-#' a \code{clinDataReview} object, a.k.a a list with the 
-#' 'plot' (\code{\link[plotly]{plotly}} object) and 'table'
-#' (\code{\link[DT]{datatable}} object)}
-#' \item{otherwise: }{a \code{\link[plotly]{plotly}} object}
+#' \item if a \code{table} is requested: a \code{clinDataReview} object, 
+#' a.k.a a list with the 'plot' (\code{\link[plotly]{plotly}} object) and 'table'
+#' (\code{\link[DT]{datatable}} object)
+#' \item otherwise: a \code{\link[plotly]{plotly}} object
 #' }
 #' @example inst/examples/scatterplotClinData-example.R
 #' @importFrom clinUtils getLabelVar
@@ -69,7 +70,8 @@ scatterplotClinData <- function(
 	# interactivity:
 	width = NULL, height = NULL,
 	hoverVars, hoverLab,
-	idVar = "USUBJID", idLab = getLabelVar(idVar, labelVars = labelVars),
+	idVar = "USUBJID", idLab = getLabelVar(idVar, labelVars = labelVars), 
+	idHighlightBox = FALSE,
 	pathVar = NULL, pathExpand = FALSE,
 	id = paste0("plotClinData", sample.int(n = 1000, size = 1)),
 	# selection
@@ -229,8 +231,9 @@ scatterplotClinData <- function(
 		idFromDataPlot = TRUE, idVarPlot = "key",
 		pathDownload = FALSE, # open in new tab
 		# selection
-		selectVars = selectVars, selectLab = selectLab, labelVars = labelVars,
-		keyVar = idVar
+		selectVars = selectVars, selectLab = selectLab, 
+		labelVars = labelVars,
+		keyVar = idVar, keyHighlightBox = idHighlightBox
 	)
 	
 	# create associated table
