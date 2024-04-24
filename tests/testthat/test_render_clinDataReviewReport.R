@@ -1097,7 +1097,7 @@ test_that("A clinical data report is created successfully in parallel", {
 		inputDir = testDir,
 		intermediateDir = file.path(testDir, "interim"),
 		outputDir = outputDir,
-		nCores = min(parallel::detectCores(), 2),
+		nCores = max(floor(parallel::detectCores()/2), 2),
 		quiet = TRUE, # suppress printing of pandoc cmd line
 		verbose = FALSE
 	)
@@ -1151,7 +1151,7 @@ test_that("A clinical data report is created successfully in parallel with one c
   chapterParallel <- file.path(testDir, "chapter-parallel.Rmd")
   cat(
     "# Parallel",
-    "```{r eval = TRUE, echo = FALSE, class.output = \"testParallel\", comment = NA}",
+    "```{r eval = TRUE, echo = FALSE, class.output = \"testparallel\", comment = NA}",
     "library(parallel)",
     "cl <- makeCluster(2)",
     "print(clusterApply(cl, 1:2, get('+'), 3))",
@@ -1194,7 +1194,7 @@ test_that("A clinical data report is created successfully in parallel with one c
 		inputDir = testDir,
 		intermediateDir = file.path(testDir, "interim"),
 		outputDir = outputDir,
-		nCores = min(parallel::detectCores(), 2),
+		nCores = max(floor(parallel::detectCores()/2), 2),
 		quiet = TRUE, # suppress printing of pandoc cmd line
 		verbose = FALSE
 	),
@@ -1219,7 +1219,7 @@ test_that("A clinical data report is created successfully in parallel with one c
   
   codeXML <- xml2::xml_find_all(
     x = htmlFileParallel, 
-    xpath = ".//pre[contains(@class, 'testParallel')]//code"
+    xpath = ".//pre[contains(@class, 'testparallel')]//code"
   )
   expect_match(object = xml2::xml_text(codeXML), regexp = "4.+5")
   

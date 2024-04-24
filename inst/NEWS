@@ -1,3 +1,14 @@
+1.5.1
+  o add extra config files: 
+    - discontinuation: summary table and listing
+    - summary barplot of visits
+    - laboratory: error bar and shift plots
+    - efficacy: error bar
+  o skeleton:
+    - fix: absolute path for logo (if nCores > 1)
+   o tests: 
+    - render report in parallel: fix with upper-case 'class.output' (knitr 1.46)
+    - moveXpt: update for extra datasets (clinUtils 0.1.5)
 1.5.0
   o scatterplot: 
     - support non character axis transformation

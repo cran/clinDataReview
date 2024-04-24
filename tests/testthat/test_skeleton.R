@@ -6,10 +6,19 @@ test_that("Example xpt files are correctly extracted to the specified folder", {
 			
 	dirData <- tempfile("data")
 	clinDataReview:::moveXpt(dirData)
-	res <- list.files(dirData)
-	expect_length(res, 8)
-	expect_setequal(object = file_ext(res), expected = "xpt")
-      
+	filesCopied <- list.files(dirData)
+	
+	# check that the file extensions are xpt
+	expect_setequal(object = tools::file_ext(filesCopied), expected = "xpt")
+	
+	# check that all files available in the clinUtils package have been copied
+	filesClinUtils <- list.files(
+		path = system.file("extdata", "cdiscpilot01", "SDTM", 
+			package = "clinUtils"),
+		pattern = "*.xpt"
+	)
+	expect_setequal(object = filesClinUtils, expected = filesCopied)
+
 })
 
 test_that("An example metadata file is correctly created", {
@@ -98,7 +107,6 @@ test_that("A skeleton report is successfully executed", {
 			inputDir = dirSkeleton,
 			outputDir = file.path(dirSkeleton, "report"), 
 			intermediateDir = file.path(dirSkeleton, "interim"),
-			# configFiles = "config-alert-division.yml",
 			quiet = TRUE, # suppress printing of pandoc cmd line
 			verbose = FALSE
 		),
@@ -117,4 +125,31 @@ test_that("A skeleton report is successfully executed", {
 		)
 	))
 			
+})
+
+test_that("A skeleton report is successfully executed in parallel", {
+  
+  skip_on_cran() 
+  
+  # fix for: 'Using anchor_sections requires Pandoc 2.0+'
+  skip_if_not(
+    condition = rmarkdown::pandoc_available(version = "2.0"), 
+    message = "pandoc 2.0 is not available"
+  )
+  
+  dirSkeleton <- tempfile("skeleton")
+  createClinDataReviewReportSkeleton(dirSkeleton)
+  
+  outputDir <- file.path(dirSkeleton, "report")
+  resReport <- render_clinDataReviewReport(
+    inputDir = dirSkeleton,
+    outputDir = outputDir, 
+    intermediateDir = file.path(dirSkeleton, "interim"),
+    quiet = TRUE, # suppress printing of pandoc cmd line
+    verbose = FALSE,
+    nCores = max(floor(parallel::detectCores()/2), 2)
+  )
+  resReport <- file.path(dirSkeleton, "report", "1-introduction.html")
+  expect_true(file.exists(resReport))
+  
 })

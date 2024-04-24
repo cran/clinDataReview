@@ -1,9 +1,9 @@
 # Report-specific parameters
 template: plotTemplate.Rmd
 templatePackage: clinDataReview
-reportTitle: Laboratory profiles
+reportTitle: "Laboratory profiles"
 reportTitleLevel: 2
-split_by: 3
+split_by: 4
 
 # Dataset of interest
 dataFileName: lb.xpt
@@ -13,13 +13,20 @@ dataProcessing:
       vars: ["RFXSTDTC", "ARM"]
     - vars: LBCAT
       varFct: 'ifelse(LBCAT == "", "Not Coded", LBCAT)'
+    # combine parameter name and unit
+    - vars: LBTESTSP
+      varLabel: "Lab Test (Standard Units)"
+      varFct: paste0(LBTEST, " (", LBSTRESU, ")")
+      
   - filter:
     # safety analysis set: treated-patients
     - var: "RFXSTDTC" 
       value: ""
       rev: true
+      
 # Looping parameters
-loopingVar: ["LBCAT", "LBTEST"]
+loopingVar: ["LBCAT", "LBTESTSP"]
+
 # Plot parameters
 plotFunction: "scatterplotClinData"
 plotParams:
@@ -42,7 +49,4 @@ plotParams:
   themePars:
       legend.position: "none"
   hoverVars: ["USUBJID", "VISIT", "LBDY", "LBSTRESN", "LBNRIND", "LBSTNRLO", "LBSTNRHI"]
-  tableVars: ["LBCAT", "LBTEST", "USUBJID", "VISIT", "LBDY", "LBSTRESN", "LBNRIND", "LBSTNRLO", "LBSTNRHI"]
-
-
-
+  tableVars: ["LBCAT", "LBTESTSP", "USUBJID", "VISIT", "LBDY", "LBSTRESN", "LBNRIND", "LBSTNRLO", "LBSTNRHI"]
