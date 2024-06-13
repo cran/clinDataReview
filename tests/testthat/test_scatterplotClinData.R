@@ -24,11 +24,16 @@ test_that("A scatterplot is correctly created", {
 			shape = "USUBJID", 
 			alpha = "LBSTRESNBL", size = "LBSTRESNBL"
 		),
-		aesLineVar = list(
-			group = "USUBJID", #color = "USUBJID", 
-			alpha = "LBSTRESNBL",
-			linetype = "USUBJID", 
-			size = "LBSTRESNBL"
+		aesLineVar = c(
+		  list(
+  			group = "USUBJID", #color = "USUBJID", 
+  			alpha = "LBSTRESNBL",
+  			linetype = "USUBJID"
+  		),
+		  setNames(
+		    list("LBSTRESNBL"), 
+		    ifelse(packageVersion("ggplot2") >= "3.4.0", "linewidth", "size")
+		  )
 		),
 		idVar = "USUBJID"
 	)
@@ -90,7 +95,6 @@ test_that('Point parameters are set correctly in a scatterplot', {
   pl <- scatterplotClinData(
     data = exampleDataScatter(),
     xVar = "time", yVar = "response",
-    aesPointVar = list(color = "treat"),
     pointPars = list( color = 'red'),
     idVar = "subj"
   )
@@ -199,12 +203,11 @@ test_that("Smoothing parameters are set correctly in a scatterplot", {
   plSmoothLayer <- scatterplotClinData(
     data = exampleData,
     xVar = "time", yVar = "response",
-    aesPointVar = list(color = "treat"),
     pointPars = list( color = 'red'),
     aesLineVar = list(group = 'subj'),
     linePars = list(linetype='dotted'),
     aesSmoothVar = list(group = 'subj'),
-    smoothPars = list(col='green', se=TRUE) ,
+    smoothPars = list(color = 'green', se=TRUE) ,
     idVar = "subj")
   
   plSmoothData <- plotly_build(plSmoothLayer)$x$data
@@ -214,12 +217,11 @@ test_that("Smoothing parameters are set correctly in a scatterplot", {
   plSmoothNoSE <- scatterplotClinData(
     data = exampleData,
     xVar = "time", yVar = "response",
-    aesPointVar = list(color = "treat"),
     pointPars = list( color = 'red'),
     aesLineVar = list(group = 'subj'),
     linePars = list(linetype='dotted'),
     aesSmoothVar = list(group = 'subj'),
-    smoothPars = list(col='green', se=FALSE),
+    smoothPars = list(color = 'green', se=FALSE),
     idVar = "subj"
   ) 
 
@@ -231,7 +233,7 @@ test_that("Smoothing parameters are set correctly in a scatterplot", {
     length(plSmoothNoSEData)
   )
   
-  # test that color is smoothing curves is set correctly
+  # test that color in smoothing curves is set correctly
   
   isLine <- sapply(plSmoothNoSEData, `[[`, "mode") == "lines"
   colors <- sapply(plSmoothNoSEData[isLine], function(x) x$line$color)
@@ -252,12 +254,11 @@ test_that("Smoothing layer can be disabled in scatterplot", {
   plWithSmoothLayer <- scatterplotClinData(
     data = exampleData,
     xVar = "time", yVar = "response",
-    aesPointVar = list(color = "treat"),
     pointPars = list( color = 'red'),
     aesLineVar = list(group = 'subj'),
     linePars = list(linetype='dotted'),
     aesSmoothVar = list(group = 'subj'),
-    smoothPars = list(col='green', se=TRUE),
+    smoothPars = list(color = 'green', se=TRUE),
     smoothInclude = TRUE,
     idVar = "subj"
   )
@@ -267,12 +268,11 @@ test_that("Smoothing layer can be disabled in scatterplot", {
   plNoSmoothLayer <- scatterplotClinData(
     data = exampleData,
     xVar = "time", yVar = "response",
-    aesPointVar = list(color = "treat"),
     pointPars = list( color = 'red'),
     aesLineVar = list(group = 'subj'),
     linePars = list(linetype='dotted'),
     aesSmoothVar = list(group = 'subj'),
-    smoothPars = list(col='green', se=TRUE),
+    smoothPars = list(color = 'green', se=TRUE),
     smoothInclude = FALSE,
     idVar = "subj"
     )
@@ -400,6 +400,52 @@ test_that("Axis labels and title are correctly set in a scatterplot", {
 		check.attributes = FALSE
 	)
 	  
+})
+
+
+test_that("Axis variable(s) are correctly included in a scatterplot", {
+  
+  data <- data.frame(
+    LBSTRESNBL = c(10, 12, 13, 14, 9),
+    LBSTRESNBLU = factor("g/L"),
+    USUBJID = as.character(seq.int(5)),
+    LBSTRESN = c(39, 93, 10, 31, 13),
+    LBSTRESU = factor(rep(x = c("mg/mL", "mg/L"), times = c(3, 2))),
+    stringsAsFactors = FALSE
+  )
+  
+  pl <- scatterplotClinData(
+    data = data, 
+    xVar = "LBSTRESNBL", xLabVar = "LBSTRESNBLU",
+    yVar = "LBSTRESN", yLabVar = "LBSTRESU",
+    labelVars = c(
+      LBSTRESNBL = "Actual value at baseline",
+      LBSTRESNBLU = "Baseline Standard Unit",
+      LBSTRESN = "Actual value at visit X",
+      LBSTRESU = "Standard Unit"
+    )
+  )
+  
+  plLayout <- plotly::plotly_build(pl)$x$layout
+
+  # title for the x-axis
+  expect_match(
+    object = plLayout$xaxis$title$text, 
+    regexp = "Actual value at baseline.+Baseline Standard Unit: g/L"
+  )
+  
+  # title for the y-axis
+  expect_match(
+    object = plLayout$yaxis$title$text, 
+    regexp = "Actual value at visit X.+Standard Unit: mg/L, mg/mL"
+  )
+  
+  # general title
+  expect_match(
+    object = plLayout$title$text, 
+    regexp = "Actual value at visit X vs Actual value at baseline"
+  )
+  
 })
 
 test_that("An interactive table is created in addition to the scatterplot", {
@@ -858,5 +904,32 @@ test_that("A box to highlight the elements of the ID variable is correctly inclu
   # check the output:
   expect_s3_class(pl, "plotly")
   expect_true(pl$x$highlight$selectize)
+  
+})
+
+test_that("A watermark is correctly included in a (facetted) scatterplot", {
+  
+  data <- data.frame(
+    USUBJID = as.character(seq.int(5)),
+    LBSTRESN = c(39, 93, 10, 31, 13),
+    LBSTRESNBL = c(10, 12, 13, 14, 9)
+  )
+  
+  file <- tempfile(pattern = "watermark", fileext = ".png")
+  getWatermark(file = file)
+  
+  pl <- scatterplotClinData(
+    data = data, 
+    xVar = "LBSTRESNBL", yVar = "LBSTRESN",
+    facetPars = list(facets = "USUBJID"),
+    watermark = file
+  )
+  
+  # check that an image has been included below the plot
+  plBuild <- plotly::plotly_build(pl)
+  expect_equal(
+    object = sapply(plBuild$x$layout$images, `[[`, "layer"),
+    expected = "below"
+  )
   
 })

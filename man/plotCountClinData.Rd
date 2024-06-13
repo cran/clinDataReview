@@ -15,9 +15,9 @@ plotCountClinData(
   colorPalette = getOption("clinDataReview.colors"),
   colorRange = NULL,
   valueType = "total",
-  titleExtra = NULL,
-  title = paste(paste(valueLab, "by", paste(varsLab, collapse = " and "), titleExtra),
+  title = paste(c(paste(valueLab, "by", paste(varsLab, collapse = " and ")), titleExtra),
     collapse = "<br>"),
+  titleExtra = NULL,
   subtitle = NULL,
   caption = NULL,
   labelVars = NULL,
@@ -34,7 +34,8 @@ plotCountClinData(
   tablePars = list(),
   id = paste0("plotClinData", sample.int(n = 1000, size = 1)),
   verbose = FALSE,
-  typePlot = c("sunburst", "treemap")
+  typePlot = c("sunburst", "treemap"),
+  watermark = NULL
 )
 }
 \arguments{
@@ -69,9 +70,9 @@ for the color variable, in case it is a numeric variable.}
 among others: 'total' (default, only if sum(child) <= to parent)
 or 'relative'.}
 
-\item{titleExtra}{String with extra title for the plot (appended after \code{title}).}
-
 \item{title}{String with title for the plot.}
+
+\item{titleExtra}{String with extra title for the plot (appended after \code{title}).}
 
 \item{subtitle}{String with subtitle.\cr
 The subtitle is included at the top left of the plot,
@@ -85,10 +86,10 @@ vertical or rotated x-axis labels.}
 \item{labelVars}{Named character vector containing variable labels.}
 
 \item{width}{Numeric, width of the plot in pixels,
-700 by default.}
+800 by default.}
 
 \item{height}{Numeric, height of the plot in pixels,
-700 by default.}
+500 by default.}
 
 \item{pathVar}{String with variable of \code{data} containing hyperlinks 
 with path to the subject-specific report, formatted as: \cr
@@ -107,7 +108,7 @@ in the table
 included in the collapsible row in the table.}
 
 \item{hoverVars}{Character vector with variable(s) to be displayed in the hover,
-by default any position and aesthetic variables displayed in the plot.}
+by default any position (and axis) and aesthetic variables displayed in the plot.}
 
 \item{hoverLab}{Named character vector with labels for \code{hoverVars}.}
 
@@ -140,6 +141,8 @@ For the visualizations, progress messages during download
 of subject-specific report are displayed in the browser console.}
 
 \item{typePlot}{String with plot type, 'treemap' or 'sunburst'.}
+
+\item{watermark}{(optional) String with path to a file containing a watermark.}
 }
 \value{
 Either:

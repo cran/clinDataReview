@@ -219,3 +219,32 @@ test_that("A label is correctly set for the selection variable in the time inter
   }
   
 })
+
+test_that("A watermark is correctly included in a time interval plot", {
+  
+  data <- data.frame(
+    subjectID = as.character(seq_len(5)),
+    startDay = c(11, 12, 7, 48, 11),
+    endDay = c(12, 26, 9, 50, 13),
+    stringsAsFactors = FALSE
+  )
+  
+  file <- tempfile(pattern = "watermark", fileext = ".png")
+  getWatermark(file = file)
+  
+  pl <- timeProfileIntervalPlot(
+    data = data,
+    paramVar = "subjectID",
+    timeStartVar = "startDay",
+    timeEndVar = "endDay",
+    watermark = file
+  )
+  
+  # check that an image has been included below the plot
+  plBuild <- plotly::plotly_build(pl)
+  expect_equal(
+    object = sapply(plBuild$x$layout$images, `[[`, "layer"),
+    expected = "below"
+  )
+  
+})

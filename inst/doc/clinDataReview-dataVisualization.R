@@ -590,6 +590,24 @@ clinUtils::knitPrintListObjects(
 )
 
 
+## ----watermark----------------------------------------------------------------------------------------------------------------------------------------------------------
+# create a file with a 'EXPLORATORY' watermark
+file <- tempfile(pattern = "watermark", fileext = ".png")
+getWatermark(file = file)
+
+# create plot
+barplotClinData(
+  data = subset(tableAE, AEDECOD != "Total"),
+  xVar = "AEDECOD", 
+  yVar = "n",
+  yLab = "Number of patients with adverse events",
+  textVar = "n",
+  labelVars = labelVars,
+  # include the watermark
+  watermark = file,
+  table = FALSE
+)
+
 ## ----palettes-default-get, results = 'markup'---------------------------------------------------------------------------------------------------------------------------
 
 # display default palettes

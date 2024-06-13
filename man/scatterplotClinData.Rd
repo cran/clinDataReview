@@ -8,8 +8,10 @@ scatterplotClinData(
   data,
   xVar,
   yVar,
-  xLab = getLabelVar(xVar, labelVars = labelVars),
-  yLab = getLabelVar(yVar, labelVars = labelVars),
+  xLab = getLabelVar(var = xVar, labelVars = labelVars),
+  xLabVar = NULL,
+  yLab = getLabelVar(var = yVar, labelVars = labelVars),
+  yLabVar = NULL,
   aesPointVar = list(),
   pointPars = list(),
   aesLineVar = list(),
@@ -28,8 +30,8 @@ scatterplotClinData(
   xLim = NULL,
   yLimExpandData = TRUE,
   xLimExpandData = TRUE,
+  title = paste(c(paste(yLab, "vs", xLab), titleExtra), collapse = "<br>"),
   titleExtra = NULL,
-  title = paste(paste(yLab, "vs", xLab, titleExtra), collapse = "<br>"),
   caption = NULL,
   subtitle = NULL,
   facetPars = list(),
@@ -55,6 +57,7 @@ scatterplotClinData(
   tableLab,
   tableButton = TRUE,
   tablePars = list(),
+  watermark = NULL,
   verbose = FALSE
 )
 }
@@ -67,7 +70,13 @@ scatterplotClinData(
 
 \item{xLab}{String with label for \code{xVar}.}
 
+\item{xLabVar}{(optional) Character vector with column(s) of \code{data} 
+containing variable(s) to display in the label of the x-axis.}
+
 \item{yLab}{String with label for \code{xVar}.}
+
+\item{yLabVar}{(optional) Character vector with column(s) of \code{data} 
+containing variable(s) to display in the label of the y-axis.}
 
 \item{aesPointVar}{List with specification of aesthetic variable(s),
 for the point, passed to the \code{mapping} parameter of \code{\link[ggplot2]{geom_point}},
@@ -125,9 +134,9 @@ expanded to include any data points outside of these
 limits?
 Please note that the same limits are set for all facets.}
 
-\item{titleExtra}{String with extra title for the plot (appended after \code{title}).}
-
 \item{title}{String with title for the plot.}
+
+\item{titleExtra}{String with extra title for the plot (appended after \code{title}).}
 
 \item{caption}{String with caption. \cr
 The caption is included at the bottom right of the plot.
@@ -177,10 +186,10 @@ of the diagonal line is displayed.
 \item{labelVars}{Named character vector containing variable labels.}
 
 \item{width}{Numeric, width of the plot in pixels,
-700 by default.}
+800 by default.}
 
 \item{height}{Numeric, height of the plot in pixels,
-700 by default.}
+500 by default.}
 
 \item{hoverVars}{Character vector with variables to be displayed in the hover,
 by default \code{xVar}, \code{yVar} and any aesthetic variables.}
@@ -243,6 +252,8 @@ the table is included within an HTML button.}
 
 \item{tablePars}{List with parameters passed to the
 \code{\link[clinUtils]{getClinDT}} function.}
+
+\item{watermark}{(optional) String with path to a file containing a watermark.}
 
 \item{verbose}{Logical, if TRUE (FALSE by default) progress messages are printed
 in the current console.

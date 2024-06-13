@@ -8,8 +8,10 @@ errorbarClinData(
   data,
   xVar,
   xLab = getLabelVar(xVar, labelVars = labelVars),
+  xLabVar = NULL,
   yVar,
   yLab = getLabelVar(yVar, labelVars = labelVars),
+  yLabVar = NULL,
   yErrorVar = NULL,
   yErrorLab = getLabelVar(yErrorVar, labelVars = labelVars),
   xErrorVar = NULL,
@@ -24,8 +26,8 @@ errorbarClinData(
   shapeLab = getLabelVar(shapeVar, labelVars = labelVars),
   shapePalette = NULL,
   size = 6,
-  titleExtra = NULL,
   title = paste(c(paste(yAxisLab, "vs", xAxisLab), titleExtra), collapse = "<br>"),
+  titleExtra = NULL,
   subtitle = NULL,
   caption = NULL,
   labelVars = NULL,
@@ -45,6 +47,7 @@ errorbarClinData(
   tableLab,
   tableButton = TRUE,
   tablePars = list(),
+  watermark = NULL,
   verbose = FALSE
 )
 }
@@ -55,9 +58,15 @@ errorbarClinData(
 
 \item{xLab}{String with label for \code{xVar}.}
 
+\item{xLabVar}{(optional) Character vector with column(s) of \code{data} 
+containing variable(s) to display in the label of the x-axis.}
+
 \item{yVar}{String with column of \code{data} containing y-variable.}
 
 \item{yLab}{String with label for \code{xVar}.}
+
+\item{yLabVar}{(optional) Character vector with column(s) of \code{data} 
+containing variable(s) to display in the label of the y-axis.}
 
 \item{xErrorVar, yErrorVar}{String with variable of \code{data}
 containing the width of the interval (from
@@ -96,9 +105,9 @@ by default.}
 \item{size}{Integer with size of markers in pixels, 
 6 by default.}
 
-\item{titleExtra}{String with extra title for the plot (appended after \code{title}).}
-
 \item{title}{String with title for the plot.}
+
+\item{titleExtra}{String with extra title for the plot (appended after \code{title}).}
 
 \item{subtitle}{String with subtitle.\cr
 The subtitle is included at the top left of the plot,
@@ -122,10 +131,10 @@ See \code{mode} attribute for plotly scatter.}
 among: 'top'/'left'/'bottom'/'right', 'bottom' by default.}
 
 \item{width}{Numeric, width of the plot in pixels,
-700 by default.}
+800 by default.}
 
 \item{height}{Numeric, height of the plot in pixels,
-700 by default.}
+500 by default.}
 
 \item{pathVar}{String with variable of \code{data} containing hyperlinks 
 with path to the subject-specific report, formatted as: \cr
@@ -144,7 +153,7 @@ in the table
 included in the collapsible row in the table.}
 
 \item{hoverVars}{Character vector with variable(s) to be displayed in the hover,
-by default any position and aesthetic variables displayed in the plot.}
+by default any position (and axis) and aesthetic variables displayed in the plot.}
 
 \item{hoverLab}{Named character vector with labels for \code{hoverVars}.}
 
@@ -176,6 +185,8 @@ the table is included within an HTML button.}
 
 \item{tablePars}{List with parameters passed to the
 \code{\link[clinUtils]{getClinDT}} function.}
+
+\item{watermark}{(optional) String with path to a file containing a watermark.}
 
 \item{verbose}{Logical, if TRUE (FALSE by default) progress messages are printed
 in the current console.

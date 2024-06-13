@@ -9,14 +9,18 @@
 #' @param xVar String with column of \code{data} containing x-variable.
 #' @param yVar String with column of \code{data} containing y-variable.
 #' @param xLab String with label for \code{xVar}.
+#' @param xLabVar (optional) Character vector with column(s) of \code{data} 
+#' containing variable(s) to display in the label of the x-axis.
 #' @param yLab String with label for \code{xVar}.
+#' @param yLabVar (optional) Character vector with column(s) of \code{data} 
+#' containing variable(s) to display in the label of the y-axis.
 #' @param xLim,yLim Numeric vector of length 2 with limits for the x/y axes.
 #' @param idVar String with variable containing subject ID.
 #' @param idLab String with label for \code{idVar}.
 #' @param width Numeric, width of the plot in pixels,
-#' 700 by default.
+#' 800 by default.
 #' @param height Numeric, height of the plot in pixels,
-#' 700 by default.
+#' 500 by default.
 #' @param facetPars List with facetting parameters, 
 #' passed to the facetting function. Variables should be specified
 #' as character or formula.
@@ -25,7 +29,7 @@
 #' are used by default.
 #' @param lineVars List with parameters for the reference lines.
 #' @param hoverVars Character vector with variable(s) to be displayed in the hover,
-#' by default any position and aesthetic variables displayed in the plot.
+#' by default any position (and axis) and aesthetic variables displayed in the plot.
 #' @param hoverLab Named character vector with labels for \code{hoverVars}.
 #' @param pathExpand Logical, should the variable in \code{pathExpand}
 #' be included in a collapsible row or as hyperlink in the table?
@@ -79,6 +83,7 @@
 #' @param selectLab (Named) character vector with label for \code{selectVars}.
 #' @param keyVar String with unique key variable, identifying unique
 #' group for which the link between the table and the plot should be done.
+#' @param watermark (optional) String with path to a file containing a watermark.
 #' @name clinDataReview-common-args
 #' @return No return value, used for the documentation of 
 #' the functions of the package.

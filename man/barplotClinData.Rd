@@ -9,13 +9,15 @@ barplotClinData(
   xVar,
   yVar,
   xLab = getLabelVar(xVar, labelVars = labelVars),
+  xLabVar = NULL,
   yLab = getLabelVar(yVar, labelVars = labelVars),
+  yLabVar = NULL,
   colorVar = NULL,
   colorLab = getLabelVar(colorVar, labelVars = labelVars),
   colorPalette = NULL,
   barmode = "group",
+  title = paste(c(paste(yLab, "vs", xLab), titleExtra), collapse = "<br>"),
   titleExtra = NULL,
-  title = paste(paste(yLab, "vs", xLab, titleExtra), collapse = "<br>"),
   caption = NULL,
   subtitle = NULL,
   labelVars = NULL,
@@ -34,6 +36,7 @@ barplotClinData(
   id = paste0("plotClinData", sample.int(n = 1000, size = 1)),
   selectVars = NULL,
   selectLab = getLabelVar(selectVars, labelVars = labelVars),
+  watermark = NULL,
   verbose = FALSE
 )
 }
@@ -46,7 +49,13 @@ barplotClinData(
 
 \item{xLab}{String with label for \code{xVar}.}
 
+\item{xLabVar}{(optional) Character vector with column(s) of \code{data} 
+containing variable(s) to display in the label of the x-axis.}
+
 \item{yLab}{String with label for \code{xVar}.}
+
+\item{yLabVar}{(optional) Character vector with column(s) of \code{data} 
+containing variable(s) to display in the label of the y-axis.}
 
 \item{colorVar}{(optional) String with color variable.}
 
@@ -59,9 +68,9 @@ See \code{\link[clinUtils]{clinColors}}.}
 \item{barmode}{String with type of barplot, either:
 'group' or 'stack' (see parameter in \code{\link[plotly]{layout}}).}
 
-\item{titleExtra}{String with extra title for the plot (appended after \code{title}).}
-
 \item{title}{String with title for the plot.}
+
+\item{titleExtra}{String with extra title for the plot (appended after \code{title}).}
 
 \item{caption}{String with caption. \cr
 The caption is included at the bottom right of the plot.
@@ -75,13 +84,13 @@ below the title.}
 \item{labelVars}{Named character vector containing variable labels.}
 
 \item{width}{Numeric, width of the plot in pixels,
-700 by default.}
+800 by default.}
 
 \item{height}{Numeric, height of the plot in pixels,
-700 by default.}
+500 by default.}
 
 \item{hoverVars}{Character vector with variable(s) to be displayed in the hover,
-by default any position and aesthetic variables displayed in the plot.}
+by default any position (and axis) and aesthetic variables displayed in the plot.}
 
 \item{hoverLab}{Named character vector with labels for \code{hoverVars}.}
 
@@ -132,6 +141,8 @@ for which a selection box should be included. This enables to select the data
 displayed in the plot (and associated table).}
 
 \item{selectLab}{(Named) character vector with label for \code{selectVars}.}
+
+\item{watermark}{(optional) String with path to a file containing a watermark.}
 
 \item{verbose}{Logical, if TRUE (FALSE by default) progress messages are printed
 in the current console.

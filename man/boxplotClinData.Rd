@@ -9,15 +9,17 @@ boxplotClinData(
   xVar,
   yVar,
   xLab = getLabelVar(xVar, labelVars = labelVars),
+  xLabVar = NULL,
   yLab = getLabelVar(yVar, labelVars = labelVars),
+  yLabVar = NULL,
   colorVar = NULL,
   colorLab = getLabelVar(colorVar, labelVars = labelVars),
   colorPalette = NULL,
   facetVar = NULL,
   facetLab = getLabelVar(facetVar, labelVars = labelVars),
   ncol = 1L,
+  title = paste(c(paste(yLab, "vs", xLab), titleExtra), collapse = "<br>"),
   titleExtra = NULL,
-  title = paste(paste(yLab, "vs", xLab, titleExtra), collapse = "<br>"),
   subtitle = NULL,
   caption = NULL,
   labelVars = NULL,
@@ -35,6 +37,7 @@ boxplotClinData(
   tableButton = TRUE,
   tablePars = list(),
   id = paste0("plotClinData", sample.int(n = 1000, size = 1)),
+  watermark = NULL,
   verbose = FALSE
 )
 }
@@ -47,7 +50,13 @@ boxplotClinData(
 
 \item{xLab}{String with label for \code{xVar}.}
 
+\item{xLabVar}{(optional) Character vector with column(s) of \code{data} 
+containing variable(s) to display in the label of the x-axis.}
+
 \item{yLab}{String with label for \code{xVar}.}
+
+\item{yLabVar}{(optional) Character vector with column(s) of \code{data} 
+containing variable(s) to display in the label of the y-axis.}
 
 \item{colorVar}{(optional) String with color variable.}
 
@@ -63,9 +72,9 @@ See \code{\link[clinUtils]{clinColors}}.}
 
 \item{ncol}{single-length integer denoting the number of columns for the facetting.}
 
-\item{titleExtra}{String with extra title for the plot (appended after \code{title}).}
-
 \item{title}{String with title for the plot.}
+
+\item{titleExtra}{String with extra title for the plot (appended after \code{title}).}
 
 \item{subtitle}{String with subtitle.\cr
 The subtitle is included at the top left of the plot,
@@ -79,13 +88,13 @@ vertical or rotated x-axis labels.}
 \item{labelVars}{Named character vector containing variable labels.}
 
 \item{width}{Numeric, width of the plot in pixels,
-700 by default.}
+800 by default.}
 
 \item{height}{Numeric, height of the plot in pixels,
-700 by default.}
+500 by default.}
 
 \item{hoverVars}{Character vector with variable(s) to be displayed in the hover,
-by default any position and aesthetic variables displayed in the plot.}
+by default any position (and axis) and aesthetic variables displayed in the plot.}
 
 \item{hoverLab}{Named character vector with labels for \code{hoverVars}.}
 
@@ -131,6 +140,8 @@ the table is included within an HTML button.}
 \item 'button:[id]' is used as button ID if \code{table} is TRUE
 }
 If not specified, a random id, as 'plotClinData[X]' is used.}
+
+\item{watermark}{(optional) String with path to a file containing a watermark.}
 
 \item{verbose}{Logical, if TRUE (FALSE by default) progress messages are printed
 in the current console.
