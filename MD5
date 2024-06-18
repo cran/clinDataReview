@@ -1,4 +1,4 @@
-973487fb79bbaaedb1f2f3c8d2bf1e34 *DESCRIPTION
+c6e71aa6445cdc68793e36272ef63c77 *DESCRIPTION
 01974937b40279205581a84931ae0cdf *LICENSE
 3153f4307adb055da8b75a30d9ff6a88 *NAMESPACE
 1be136edf898d3a15b64e5a924e1d7da *R/dataManipulation-annotateData.R
@@ -20,7 +20,7 @@ a7c16f3007588e4b26802fbd8ddc5bf4 *R/plots-sunburstClinData.R
 af39342a49e1e02a406a128592e53403 *R/plots-tableClinData.R
 68fd4e9c704074e9bf2a7b642b9530be *R/plots-timeProfileIntervalPlot.R
 19316ef4cb1586cb70c47457af8af0a3 *R/plots-treemapClinData.R
-d2afde04606d54f24131177f83863af6 *R/plots-utility-axes.R
+8b750d38f790678cecfa6081073bfcca *R/plots-utility-axes.R
 fc1f47c934a4e0098d9c0e85b6d1315c *R/plots-utility-axisLabels.R
 4a868619ca10bc56870f47d016aa6241 *R/plots-utility-checkValueType.R
 56e6a507fc8edf46f9731c4dcdaa0e48 *R/plots-utility-dimensions.R
@@ -45,17 +45,17 @@ ce70ecfffcee0a2aa26e25225a998b45 *R/reporting-render-sessionInfo.R
 3a89281866849bbebb45282a6ff8beb1 *R/reporting-utility.R
 3165946a513908a1c06c0676ddc779ad *R/reporting-zipClinDataReviewReport.R
 ddfdb9ae032753f66bb978e376ec1b7b *build/vignette.rds
-8a132cd63dc5ea3c1a95a45ff4757f1b *inst/NEWS
+9fd39fce04dc99c9da010c2b78d936de *inst/NEWS
 f8f98392aa4ca803b9803b374aa353a9 *inst/css/gitbook.css
 58a7ba585f7b432218ea751a6c430a38 *inst/doc/clinDataReview-dataPreprocessing.R
 365a4ec72a8c51105b13171acb4790c1 *inst/doc/clinDataReview-dataPreprocessing.Rmd
-e7d3b9109b6591ef004bec3be300013c *inst/doc/clinDataReview-dataPreprocessing.html
+6061ecf0e8bde76e9fa7aa8ea3f00894 *inst/doc/clinDataReview-dataPreprocessing.html
 131324458d4300140008966c547654df *inst/doc/clinDataReview-dataVisualization.R
 f4ddf9f972ce038d87d5dcf136b479ae *inst/doc/clinDataReview-dataVisualization.Rmd
-8559bffe4cb28dd44dcf8c94915a7f1a *inst/doc/clinDataReview-dataVisualization.html
+e7e20ef58547586157f208eb5ebe19b9 *inst/doc/clinDataReview-dataVisualization.html
 0334ff9ecfdbd3d8d2838dd71ab49267 *inst/doc/clinDataReview-reporting.R
 2649598819530c536c10ed8703ce0e19 *inst/doc/clinDataReview-reporting.Rmd
-c157dfbd87d1c44fe44350e02432f403 *inst/doc/clinDataReview-reporting.html
+2824b74f54a1338ad86f4f84ea2f8f6e *inst/doc/clinDataReview-reporting.html
 3501bb1bf3c4e4e35eeb9d7cb46025b0 *inst/examples/annotateData-example.R
 9c7f9fda4d82cf88849cb64b681bd0e6 *inst/examples/barplotClinData-example.R
 1fe4b8e90607ddc37ae38a4a903b0a03 *inst/examples/boxplotClinData-example.R
@@ -251,7 +251,7 @@ c7e7b1230b972012a90ac0e0712ee1b6 *tests/testthat/test_render_clinDataReviewRepor
 76a95b8f4faa6f450dc690d5f94f8d41 *tests/testthat/test_reportingFormats.R
 731fd132eea298f733ab920cd7fe19ac *tests/testthat/test_reportingTemplates.R
 9bbfbeb8a5699b6bcf080ab047cc6597 *tests/testthat/test_reportingUtility.R
-6bd4cd731ffd0c4ae546ccbf38b62f8d *tests/testthat/test_scatterplotClinData.R
+179270eb4131f45c5d29ebe2fe4df6c5 *tests/testthat/test_scatterplotClinData.R
 947a78abc01e4c6105a4dba6ea177aef *tests/testthat/test_skeleton.R
 c727ef5b036b696fdfc1c791b1df237d *tests/testthat/test_staticScatterplotClinData.R
 84414c31d83cc60784a968b97d7ff3f4 *tests/testthat/test_sunburstClinData.R
