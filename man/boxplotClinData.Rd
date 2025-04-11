@@ -200,8 +200,6 @@ boxplotClinData(
 	labelVars = labelVars
 )
 
-\dontrun{
-
 # Facet or color is optional:
 boxplotClinData(
 	data = data,
@@ -230,8 +228,6 @@ boxplotClinData(
 	caption = "Summary statistics are computed internally.",
 	labelVars = labelVars
 )
-
-}
 }
 \seealso{
 Other visualizations of summary statistics for clinical data: 

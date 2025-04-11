@@ -222,8 +222,6 @@ if(interactive()){
   )
 }
 
-\dontrun{
-
 # display percentage of events per severity
 tableAEBySeverity <- inTextSummaryTable::computeSummaryStatisticsTable(
 	data = dataAE,
@@ -253,8 +251,6 @@ barplotClinData(
 	# add subtitle
 	subtitle = "Group: severity"
 )
-
-}
 
 }
 }

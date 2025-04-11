@@ -311,10 +311,6 @@ scatterplotClinData(
 	labelVars = labelVars
 )
 
-
-
-\dontrun{
-
 # add number of subjects below each visit
 	
 if (requireNamespace("inTextSummaryTable", quietly = TRUE)) {
@@ -337,8 +333,6 @@ scatterplotClinData(
 	aesLineVar = list(group = "USUBJID", color = "TRTP"),
 	labelVars = labelVars
 )
-
-}
 
 }
 
@@ -368,8 +362,6 @@ scatterplotClinData(
 	subtitle = "Visualization is split by visit",
 	caption = "Points are colored by subject ID"
 )
-
-\dontrun{
 
 # scatterplot with all visits, link subjects
 xLab <- getLabelParamcd(paramcd = "ALT", data = dataLB, 
@@ -429,7 +421,7 @@ scatterplotClinData(
 ## scatterplot with smoothing layer
 
 data <- data.frame(
-  subj = c(rep('subj1', 20), rep('subj2', 20)),
+  USUBJID = c(rep('subj1', 20), rep('subj2', 20)),
   time = rep( 1:20 , 2 ),
   response =  c(1:20, 50:31) + runif(min =-3, max = +3, 40),
   treat =  rep(c('trA', 'trB'), 20),
@@ -437,31 +429,27 @@ data <- data.frame(
 )
 
 # smoothing per subject
-smoothPlot <- scatterplotClinData(
+scatterplotClinData(
   data = data,
   xVar = "time", yVar = "response",
   aesPointVar = list(color = "treat"),
-  aesLineVar = list(group = 'subj'),
+  aesLineVar = list(group = 'USUBJID'),
   linePars = list(linetype='dotted'),
-  aesSmoothVar = list(color='subj', group='subj'), 
+  aesSmoothVar = list(color='USUBJID', group='USUBJID'), 
   smoothPars =  list(alpha=0.5, size=0.3 , se=TRUE, color = 'black')
 )
-smoothPlot
 
 
 # plot smoothing over subjects
-smoothPlot <- scatterplotClinData(
+scatterplotClinData(
   data = data,
   xVar = "time", yVar = "response",
   aesPointVar = list(color = "treat"),
-  aesLineVar = list(group = 'subj'),
+  aesLineVar = list(group = 'USUBJID'),
   linePars = list(linetype='dotted'),
   aesSmoothVar = list(), 
   smoothPars =  list(alpha=0.5, size=0.3 , se=TRUE, color = 'black')
 )
-smoothPlot
-
-}
 
 # add a selection box
 if(interactive()){

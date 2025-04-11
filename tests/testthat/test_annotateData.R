@@ -155,7 +155,7 @@ test_that("Data is correctly annotated with a new variable, from a function of t
 	
 	dataAnnot <- annotateData(
 		data = data,
-          annotations = list(
+  annotations = list(
 			vars = "AGEYEAR",
 			varFct = function(data) with(data, sprintf("%s %s", data$AGE, data$YEAR)),
 			varLabel = "Age and year"
@@ -204,14 +204,14 @@ test_that("Data is correctly annotated based on an exported dataset", {
 		YEAR = c(1967, 1943, 1987, 1970, 1954),
 		stringsAsFactors = FALSE
 	)
-	dir <- tempdir("annotation")
-	dataPath <- file.path(dir, "dm.xpt")
-	write_xpt(data = dataDM, path = dataPath)
+	path <- tempfile(pattern = "dm" , fileext = ".xpt")
+ name <- tools::file_path_sans_ext(basename(path))
+	write_xpt(data = dataDM, path = path)
 	
 	dataAnnot <- annotateData(
 		data = data,
-		dataPath = dir,
-		annotations = list(dataset = "dm")
+		dataPath = dirname(path),
+		annotations = list(dataset = name)
 	)
 	
 	expect_equal(
@@ -234,14 +234,14 @@ test_that("Data is correctly annotated with a specified variable based on an exp
 		YEAR = c(1967, 1943, 1987, 1970, 1954),
 		stringsAsFactors = FALSE
 	)
-	dir <- tempdir("annotation")
-	dataPath <- file.path(dir, "dm.xpt")
-	write_xpt(data = dataDM, path = dataPath)
+ path <- tempfile(pattern = "dm" , fileext = ".xpt")
+ name <- tools::file_path_sans_ext(basename(path))
+	write_xpt(data = dataDM, path = path)
 		
 	dataAnnot <- annotateData(
 		data = data,
-		dataPath = dir,
-		annotations = list(dataset = "dm", vars = "AGE")
+		dataPath = dirname(path),
+		annotations = list(dataset = name, vars = "AGE")
 	)
 	expect_identical(
 		object = colnames(dataAnnot),
@@ -368,13 +368,12 @@ test_that("Data is correctly annotated based on the preset 'demographics' option
 		YEAR = c(1967, 1943, 1987, 1970, 1954),
 		stringsAsFactors = FALSE
 	)
-	dir <- tempdir("annotation")
-	dataPath <- file.path(dir, "dm.xpt")
-	write_xpt(data = dataDM, path = dataPath)
+ path <- file.path(tempdir(), "dm.xpt")
+	write_xpt(data = dataDM, path = path)
 	
 	dataAnnot <- annotateData(
 		data = dataLB,
-		dataPath = dir,
+		dataPath = dirname(path),
 		annotations = "demographics"
 	)
 	expect_equal(
@@ -453,13 +452,12 @@ test_that("Data is correctly annotated based on the preset 'exposed_subjects' op
 		STDY = c("0103", "0102", "0104", ""),
 		stringsAsFactors = FALSE
 	)
-	dir <- tempdir("annotation")
-	dataPath <- file.path(dir, "ex.xpt")
-	write_xpt(data = dataEX, path = dataPath)
+ path <- file.path(tempdir(), "ex.xpt")
+	write_xpt(data = dataEX, path = path)
 	
 	dataAnnotEx <- annotateData(
 		data = dataLB,
-		dataPath = dir,
+		dataPath = dirname(path),
 		annotations = "exposed_subjects"
 	)
 	# subjects with start date in exposure dataset
@@ -487,14 +485,13 @@ test_that("An error is generated when annotating with the preset 'exposed_subjec
 		STDY = c("0103", "0102", "0104", ""),
 		stringsAsFactors = FALSE
 	)
-	dir <- tempdir("annotation")
-	dataPath <- file.path(dir, "ex.xpt")
-	write_xpt(data = dataEX, path = dataPath)		
-			
+ path <- file.path(tempdir(), "ex.xpt")
+ write_xpt(data = dataEX, path = path)
+ 		
 	expect_error(
 		annotateData(
 			data = dataLB,
-			dataPath = dir,
+			dataPath = dirname(path),
 			annotations = "exposed_subjects",
 			subjectVar = "USUBJID"
 		),
@@ -512,14 +509,13 @@ test_that("An error is generated when annotating with the preset 'exposed_subjec
 			
 	# export annotation dataset
 	dataEX <- data.frame(USUBJID = seq.int(4))
-	dir <- tempdir("annotation")
-	dataPath <- file.path(dir, "ex.xpt")
-	write_xpt(data = dataEX, path = dataPath)		
-			
+ path <- file.path(tempdir(), "ex.xpt")
+ write_xpt(data = dataEX, path = path)
+ 
 	expect_error(
 		annotateData(
 			data = dataLB,
-			dataPath = dir,
+			dataPath = dirname(path),
 			annotations = "exposed_subjects",
 			subjectVar = "USUBJID"
 		),

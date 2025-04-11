@@ -1,4 +1,4 @@
-## ----options, echo = FALSE, message = FALSE-----------------------------------------------------------------------------------------------------------------------------
+## ----options, echo = FALSE, message = FALSE-----------------------------------
 
 library(knitr)
 opts_chunk$set(
@@ -9,18 +9,15 @@ opts_chunk$set(
     fig.width = 8, fig.height = 7,
     fig.path = "./figures_vignette/",
     fig.align = 'center')
-options(width = 170)#, stringsAsFactors = FALSE
-options(warn = 1)#instead of warn = 0 by default -> to have place where warnings occur in the call to Sweave function
 
 heightLineIn  <- 0.2
 
-
-## ----loadPackages, message = FALSE--------------------------------------------------------------------------------------------------------------------------------------
+## ----loadPackages, message = FALSE--------------------------------------------
 
 library(clinDataReview)
 
 
-## ----loadData-----------------------------------------------------------------------------------------------------------------------------------------------------------
+## ----loadData-----------------------------------------------------------------
 
 library(clinUtils)
 
@@ -32,7 +29,7 @@ dataDM <- dataADaMCDISCP01$ADSL
 dataAE <- dataADaMCDISCP01$ADAE
 
 
-## ----annotateData, message = TRUE, warning = TRUE-----------------------------------------------------------------------------------------------------------------------
+## ----annotateData, message = TRUE, warning = TRUE-----------------------------
 
 dataLBAnnot <- annotateData(
     data = dataLB, 
@@ -46,7 +43,7 @@ knitr::kable(
     )
 )
 
-## ----filterData, message = TRUE, warning = TRUE-------------------------------------------------------------------------------------------------------------------------
+## ----filterData, message = TRUE, warning = TRUE-------------------------------
 
 dataLBAnnotTreatment <- filterData(
     data = dataLBAnnot, 
@@ -60,7 +57,7 @@ knitr::kable(
     )
 )
 
-## ----transformData, message = TRUE, warning = TRUE----------------------------------------------------------------------------------------------------------------------
+## ----transformData, message = TRUE, warning = TRUE----------------------------
 
 eDishData <- transformData(
     data = subset(dataLB, PARAMCD %in% c("ALT", "BILI")),
@@ -76,7 +73,7 @@ eDishData <- transformData(
 knitr::kable(head(eDishData))
 
 
-## ----processData--------------------------------------------------------------------------------------------------------------------------------------------------------
+## ----processData--------------------------------------------------------------
 
 dataLBAnnotTreatment2 <- processData(
     data = dataLB,
@@ -90,7 +87,7 @@ dataLBAnnotTreatment2 <- processData(
 identical(dataLBAnnotTreatment, dataLBAnnotTreatment2)
 
 
-## ----sessionInfo, echo = FALSE------------------------------------------------------------------------------------------------------------------------------------------
+## ----sessionInfo, echo = FALSE------------------------------------------------
 
 print(sessionInfo())
 

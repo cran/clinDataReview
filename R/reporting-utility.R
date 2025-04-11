@@ -105,6 +105,7 @@ print.clinDataReview <- function(x, ...){
 #' @param x Object of class \code{clinDataReview}
 #' @param ... Extra parameters for compatibility with \code{\link[knitr]{knit_print}},
 #' not used currently.
+#' @inherit htmltools::knit_print.shiny.tag.list return
 #' @importFrom knitr knit_print
 #' @importFrom htmltools tagList knit_print.shiny.tag.list
 #' @author Laure Cougnaud

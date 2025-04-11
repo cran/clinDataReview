@@ -37,10 +37,11 @@ checkConfigFile <- function(configFile, configSpecFile, configDir = "./config"){
 #' package
 #' @author Laure Cougnaud
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' pathDivisionTemplate <- getPathTemplate("divisionTemplate.Rmd") # get path template in the package
-#' file.copy(from = pathDivisionTemplate, to = ".") # copy to current directlory
-#' rmarkdown::render(pathDivisionTemplate) # run file 
+#' tmp <- file.copy(from = pathDivisionTemplate, to = tempdir()) # copy to temporary dir (for example)
+#' params <- list(reportTitle = "Adverse events")
+#' rmarkdown::render(file.path(tempdir(), basename(pathDivisionTemplate))) # run file 
 #' }
 #' @export
 getPathTemplate <- function(file, package = "clinDataReview"){  

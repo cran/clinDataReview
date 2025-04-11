@@ -105,10 +105,9 @@ dataAE <- dataADaMCDISCP01$ADAE
 labelVars <- attr(dataADaMCDISCP01, "labelVars")
 
 # standard annotations:
+
 # path to dataset should be specified via: 'pathData'
-\dontrun{
-annotateData(dataLB, annotations = "demographics", pathData = ...)
-}
+# annotateData(dataLB, annotations = "demographics", pathData = ...)
 
 # add all variables in annotation data (if not already available)
 head(annotateData(dataLB, annotations = list(data = dataDM)), 1)

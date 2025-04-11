@@ -273,8 +273,6 @@ varToFm <- function(var){
 #' @return Integer vector of length \code{x} with number
 #' of lines
 #' @author Laure Cougnaud
-#' @examples 
-#' clinDataReview:::countNLines(x = c("A\nB", "blabla", "This\nis\na\nsentence."))
 countNLines <- function(x){
 	
 	lines <- regmatches(

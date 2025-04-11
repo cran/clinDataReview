@@ -16,9 +16,6 @@ of lines
 \description{
 Count number of lines in a vector
 }
-\examples{
-clinDataReview:::countNLines(x = c("A\nB", "blabla", "This\nis\na\nsentence."))
-}
 \author{
 Laure Cougnaud
 }

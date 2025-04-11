@@ -24,9 +24,6 @@ opts_chunk$set(
     fig.width = 8, fig.height = 7,
     fig.path = "./figures_vignette/",
     fig.align = 'center')
-options(width = 170)#, stringsAsFactors = FALSE
-options(warn = 1)#instead of warn = 0 by default -> to have place where warnings occur in the call to Sweave function
-
 ```
 
 This vignette focuses on the visualizations available in the 
@@ -93,8 +90,12 @@ the interactive visualizations only during an interactive session
  (via `interactive()`) .
 
 ```{r patientProfilesCreate, results = "hide", eval = hasPandoc & interactive()}
+# please change to the working directory
+# (a temporary directory is used for the vignette)
+dir <- tempdir()
+
 # create a directory to store the patient profiles:
-patientProfilesDir <- "patientProfiles"
+patientProfilesDir <- file.path(dir, "patientProfiles")
 dir.create(patientProfilesDir)
 
 # get examples of parameters for the report
@@ -111,14 +112,16 @@ params$pathDataFolder <- system.file("extdata", "cdiscpilot01", "SDTM", package 
 params$patientProfilePath <- patientProfilesDir
 
 # create patient profiles
-pathTemplate <- clinDataReview::getPathTemplate(params$template)
-file.copy(from = pathTemplate, to = ".")
+pathTemplatePkg <- clinDataReview::getPathTemplate(params$template)
+pathTemplateUser <- file.path(dir, basename(pathTemplatePkg))
+tmp <- file.copy(from = pathTemplatePkg, to = pathTemplateUser)
 report <- rmarkdown::render(
-	input = basename(pathTemplate), 
-	envir = new.env()
+  input = pathTemplateUser, 
+  envir = new.env()
 )
-unlink(basename(pathTemplate))
-unlink(basename(report))
+
+# clean-up
+unlink(pathTemplateUser);unlink(report)
 ```
 
 Please refer to the vignette about reporting for more details on how 
@@ -777,7 +780,7 @@ A watermark can be included in any of the visualization of the package, from a s
 
 In this example, an exploratory watermark is added to the adverse events barplot.
 
-```{r watermark}
+```{r watermark, eval = requireNamespace("inTextSummaryTable", quietly = TRUE)}
 # create a file with a 'EXPLORATORY' watermark
 file <- tempfile(pattern = "watermark", fileext = ".png")
 getWatermark(file = file)
@@ -837,11 +840,9 @@ The palettes can be set for all visualizations, e.g. at the start of the R
 session, with:
 
 ```{r palettes-customGeneral-set}
-
 # change palettes for the entire R session
 options(clinDataReview.colors = c("gold", "pink", "cyan"))
 options(clinDataReview.shapes = clinShapes)
-
 ```
 
 In case the palette contains less elements than available in the data, these are

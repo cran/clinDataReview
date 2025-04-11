@@ -1,3 +1,11 @@
+1.6.2
+  o fix use of tempdir in tests
+  o [doc] examples:
+    - removed for non exported function
+    - remove \dontrun: not needed
+  o [doc] examples/vignette: do not write in working directory
+  o [doc] knit.print: add return
+  o [doc] vignette: remove 'options'
 1.6.1
   o fix when reference line is numeric and x-variable a factor/character
 1.6.0

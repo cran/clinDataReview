@@ -1,4 +1,4 @@
-## ----options, echo = FALSE, message = FALSE-----------------------------------------------------------------------------------------------------------------------------
+## ----options, echo = FALSE, message = FALSE-----------------------------------
 
 library(knitr)
 opts_chunk$set(
@@ -9,20 +9,17 @@ opts_chunk$set(
     fig.width = 8, fig.height = 7,
     fig.path = "./figures_vignette/",
     fig.align = 'center')
-options(width = 170)#, stringsAsFactors = FALSE
-options(warn = 1)#instead of warn = 0 by default -> to have place where warnings occur in the call to Sweave function
 
-
-## ----checkPandocAvailability, echo = FALSE------------------------------------------------------------------------------------------------------------------------------
+## ----checkPandocAvailability, echo = FALSE------------------------------------
 hasPandoc <- rmarkdown::pandoc_available()
 
-## ----loadLibraries------------------------------------------------------------------------------------------------------------------------------------------------------
+## ----loadLibraries------------------------------------------------------------
 
 library(clinDataReview)
 library(plotly)
 
 
-## ----loadData-----------------------------------------------------------------------------------------------------------------------------------------------------------
+## ----loadData-----------------------------------------------------------------
 
 library(clinUtils)
 
@@ -42,40 +39,46 @@ varsDM <- c("RFSTDTC", "USUBJID")
 dataDM <- dataADaMCDISCP01$ADSL[, varsDM]
 
 
-## ----patientProfilesCreate, results = "hide", eval = hasPandoc & interactive()------------------------------------------------------------------------------------------
-#  # create a directory to store the patient profiles:
-#  patientProfilesDir <- "patientProfiles"
-#  dir.create(patientProfilesDir)
-#  
-#  # get examples of parameters for the report
-#  configDir <- system.file("skeleton", "config", package = "clinDataReview")
-#  params <- getParamsFromConfig(
-#  	configDir = configDir,
-#  	configFile = "config-patientProfiles.yml"
-#  )
-#  # create patient profile with only one panel for the demo
-#  params$patientProfilesParams <- params$patientProfilesParams[1]
-#  # use dataset from the clinUtils package
-#  params$pathDataFolder <- system.file("extdata", "cdiscpilot01", "SDTM", package = "clinUtils")
-#  # store patient profile in this folder:
-#  params$patientProfilePath <- patientProfilesDir
-#  
-#  # create patient profiles
-#  pathTemplate <- clinDataReview::getPathTemplate(params$template)
-#  file.copy(from = pathTemplate, to = ".")
-#  report <- rmarkdown::render(
-#  	input = basename(pathTemplate),
-#  	envir = new.env()
-#  )
-#  unlink(basename(pathTemplate))
-#  unlink(basename(report))
+## ----patientProfilesCreate, results = "hide", eval = hasPandoc & interactive()----
+# # please change to the working directory
+# # (a temporary directory is used for the vignette)
+# dir <- tempdir()
+# 
+# # create a directory to store the patient profiles:
+# patientProfilesDir <- file.path(dir, "patientProfiles")
+# dir.create(patientProfilesDir)
+# 
+# # get examples of parameters for the report
+# configDir <- system.file("skeleton", "config", package = "clinDataReview")
+# params <- getParamsFromConfig(
+# 	configDir = configDir,
+# 	configFile = "config-patientProfiles.yml"
+# )
+# # create patient profile with only one panel for the demo
+# params$patientProfilesParams <- params$patientProfilesParams[1]
+# # use dataset from the clinUtils package
+# params$pathDataFolder <- system.file("extdata", "cdiscpilot01", "SDTM", package = "clinUtils")
+# # store patient profile in this folder:
+# params$patientProfilePath <- patientProfilesDir
+# 
+# # create patient profiles
+# pathTemplatePkg <- clinDataReview::getPathTemplate(params$template)
+# pathTemplateUser <- file.path(dir, basename(pathTemplatePkg))
+# tmp <- file.copy(from = pathTemplatePkg, to = pathTemplateUser)
+# report <- rmarkdown::render(
+#   input = pathTemplateUser,
+#   envir = new.env()
+# )
+# 
+# # clean-up
+# unlink(pathTemplateUser);unlink(report)
 
-## ----reportingVignette, eval = FALSE------------------------------------------------------------------------------------------------------------------------------------
-#  
-#  vignette("clinDataReview-reporting", "clinDataReview")
-#  
+## ----reportingVignette, eval = FALSE------------------------------------------
+# 
+# vignette("clinDataReview-reporting", "clinDataReview")
+# 
 
-## ----timeProfiles, eval = hasPandoc-------------------------------------------------------------------------------------------------------------------------------------
+## ----timeProfiles, eval = hasPandoc-------------------------------------------
 
 labParam <- "ALT"
 dataPlot <- subset(dataLB, PARAMCD == labParam)
@@ -118,7 +121,7 @@ scatterplotClinData(
 )
 
 
-## ----scatterplot, eval = hasPandoc--------------------------------------------------------------------------------------------------------------------------------------
+## ----scatterplot, eval = hasPandoc--------------------------------------------
 # format data long -> wide format (one column per lab param)
 dataPlot <- subset(dataLB, PARAMCD %in% c("ALT", "ALB"))
 dataPlot <- stats::aggregate(
@@ -158,7 +161,7 @@ scatterplotClinData(
 )
 
 
-## ----eDishPlot, eval = hasPandoc----------------------------------------------------------------------------------------------------------------------------------------
+## ----eDishPlot, eval = hasPandoc----------------------------------------------
 
 dataALT <- subset(dataLB, PARAMCD == "ALT")
 dataBILI <- subset(dataLB, PARAMCD == "BILI")
@@ -205,7 +208,7 @@ scatterplotClinData(
 )
 
 
-## ----timeProfileIntervalPlot, eval = hasPandoc--------------------------------------------------------------------------------------------------------------------------
+## ----timeProfileIntervalPlot, eval = hasPandoc--------------------------------
 
 # link to patient profiles
 if(interactive())
@@ -228,7 +231,7 @@ timeProfileIntervalPlot(
 )
 
 
-## ----timeProfileIntervalPlot-shapeVariables, eval = hasPandoc-----------------------------------------------------------------------------------------------------------
+## ----timeProfileIntervalPlot-shapeVariables, eval = hasPandoc-----------------
 
 # create variable to indicate status of start/end date
 dataAE$AESTFLG <- ifelse(is.na(dataAE$ASTDY), "Missing start", "Complete")
@@ -265,7 +268,7 @@ timeProfileIntervalPlot(
 )
 
 
-## ----computeSummaryStatistics-categoricalVariable, eval = requireNamespace("inTextSummaryTable", quietly = TRUE)--------------------------------------------------------
+## ----computeSummaryStatistics-categoricalVariable, eval = requireNamespace("inTextSummaryTable", quietly = TRUE)----
 
 # total counts: Safety Analysis Set (patients with start date for the first treatment)
 dataTotal <- subset(dataDM, RFSTDTC != "")
@@ -347,7 +350,7 @@ knitr::kable(head(tableAE),
 )
 
 
-## ----sunburst, eval = hasPandoc & requireNamespace("inTextSummaryTable", quietly = TRUE)--------------------------------------------------------------------------------
+## ----sunburst, eval = hasPandoc & requireNamespace("inTextSummaryTable", quietly = TRUE)----
 
 dataSunburst <- tableAE
 
@@ -365,7 +368,7 @@ sunburstClinData(
 )
 
 
-## ----treemap, eval = hasPandoc & requireNamespace("inTextSummaryTable", quietly = TRUE)---------------------------------------------------------------------------------
+## ----treemap, eval = hasPandoc & requireNamespace("inTextSummaryTable", quietly = TRUE)----
 
 dataTreemap <- tableAE
 
@@ -383,7 +386,7 @@ treemapClinData(
 )
 
 
-## ----barplot, eval = hasPandoc & requireNamespace("inTextSummaryTable", quietly = TRUE)---------------------------------------------------------------------------------
+## ----barplot, eval = hasPandoc & requireNamespace("inTextSummaryTable", quietly = TRUE)----
 
 dataPlot <- subset(tableAE, AEDECOD != "Total")
 
@@ -403,7 +406,7 @@ barplotClinData(
 )
 
 
-## ----getData-continuousVariable-----------------------------------------------------------------------------------------------------------------------------------------
+## ----getData-continuousVariable-----------------------------------------------
 
 dataVSDIABP <- subset(dataADaMCDISCP01$ADVS, 
 	PARAMCD == "DIABP" & ANL01FL == "Y" &
@@ -431,7 +434,7 @@ if(interactive()){
 }
 
 
-## ----computeSummaryStatistics-continuousVariable, eval = requireNamespace("inTextSummaryTable", quietly = TRUE)---------------------------------------------------------
+## ----computeSummaryStatistics-continuousVariable, eval = requireNamespace("inTextSummaryTable", quietly = TRUE)----
 
 # Specify extra summarizations besides the standard stats
 # When the data is summarized,
@@ -474,7 +477,7 @@ summaryTableCont <- inTextSummaryTable::computeSummaryStatisticsTable(
 )
 knitr::kable(head(summaryTableCont, 1))
 
-## ----errorbarClinData, eval = hasPandoc & requireNamespace("inTextSummaryTable", quietly = TRUE)------------------------------------------------------------------------
+## ----errorbarClinData, eval = hasPandoc & requireNamespace("inTextSummaryTable", quietly = TRUE)----
 
 dataPlot <- subset(summaryTableCont, !isTotal)
 
@@ -503,7 +506,7 @@ errorbarClinData(
 )
 
 
-## ----boxplot, eval = hasPandoc------------------------------------------------------------------------------------------------------------------------------------------
+## ----boxplot, eval = hasPandoc------------------------------------------------
 
 dataPlot <- subset(dataADaMCDISCP01$ADVS, 
 	PARAMCD == "DIABP" & ANL01FL == "Y" &
@@ -532,15 +535,15 @@ boxplotClinData(
 )
 
 
-## ----'objectsList1', results = 'asis', echo = FALSE---------------------------------------------------------------------------------------------------------------------
+## ----'objectsList1', results = 'asis', echo = FALSE---------------------------
 cat("\n", paste(rep("#", titleLevel), collapse = ""), " Potassium (mmol/L)\n", sep = "")
 xList[[1]]
 
-## ----'objectsList2', results = 'asis', echo = FALSE---------------------------------------------------------------------------------------------------------------------
+## ----'objectsList2', results = 'asis', echo = FALSE---------------------------
 cat("\n", paste(rep("#", titleLevel), collapse = ""), " Sodium (mmol/L)\n", sep = "")
 xList[[2]]
 
-## ----lab-profile-loop, results = "asis", eval = hasPandoc---------------------------------------------------------------------------------------------------------------
+## ----lab-profile-loop, results = "asis", eval = hasPandoc---------------------
 
 # consider only restricted set of lab parameters
 dataPlot <- subset(dataLB, PARAMCD %in% c("SODIUM", "K"))
@@ -590,7 +593,7 @@ clinUtils::knitPrintListObjects(
 )
 
 
-## ----watermark----------------------------------------------------------------------------------------------------------------------------------------------------------
+## ----watermark, eval = requireNamespace("inTextSummaryTable", quietly = TRUE)----
 # create a file with a 'EXPLORATORY' watermark
 file <- tempfile(pattern = "watermark", fileext = ".png")
 getWatermark(file = file)
@@ -608,7 +611,7 @@ barplotClinData(
   table = FALSE
 )
 
-## ----palettes-default-get, results = 'markup'---------------------------------------------------------------------------------------------------------------------------
+## ----palettes-default-get, results = 'markup'---------------------------------
 
 # display default palettes
 colorsDefault <- getOption("clinDataReview.colors")
@@ -617,7 +620,7 @@ shapesDefault <- getOption("clinDataReview.shapes")
 str(shapesDefault)
 
 
-## ----palettes-default-example, eval = hasPandoc-------------------------------------------------------------------------------------------------------------------------
+## ----palettes-default-example, eval = hasPandoc-------------------------------
 
 timeProfileIntervalPlot(
     data = dataAE,
@@ -632,14 +635,12 @@ timeProfileIntervalPlot(
 )
 
 
-## ----palettes-customGeneral-set-----------------------------------------------------------------------------------------------------------------------------------------
-
+## ----palettes-customGeneral-set-----------------------------------------------
 # change palettes for the entire R session
 options(clinDataReview.colors = c("gold", "pink", "cyan"))
 options(clinDataReview.shapes = clinShapes)
 
-
-## ----palettes-customGeneral-example, eval = hasPandoc-------------------------------------------------------------------------------------------------------------------
+## ----palettes-customGeneral-example, eval = hasPandoc-------------------------
 
 timeProfileIntervalPlot(
     data = dataAE,
@@ -654,14 +655,14 @@ timeProfileIntervalPlot(
 )
 
 
-## ----palettes-default-reset---------------------------------------------------------------------------------------------------------------------------------------------
+## ----palettes-default-reset---------------------------------------------------
 
 # change palettes for the entire R session
 options(clinDataReview.colors = colorsDefault)
 options(clinDataReview.shapes = shapesDefault)
 
 
-## ----sessionInfo, echo = FALSE------------------------------------------------------------------------------------------------------------------------------------------
+## ----sessionInfo, echo = FALSE------------------------------------------------
 
 print(sessionInfo())
 
